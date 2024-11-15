@@ -7,9 +7,16 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 interface MainLayoutProps {
   children: React.ReactNode;
   isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, isAuthenticated }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children, isAuthenticated, setIsAuthenticated }) => {
+  // handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -19,6 +26,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, isAuthenticated }) =>
             <h1 className="text-3xl font-bold text-gray-900">
               HR Management System
             </h1>
+            {isAuthenticated && (
+              <button onClick={handleLogout} className="bg-black text-white px-2 py-1 rounded">
+                Log Out
+              </button>
+            )}
           </div>
         </div>
       </header>

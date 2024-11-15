@@ -20,14 +20,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
                 setIsAuthenticated(true);
                 setMessage(response.data.message);
             } else {
-                setMessage(response.data.message || 'Login failed. Please check your ID and try again.');
+                setMessage('Login failed. Please check your ID and try again.');
             }
         } catch (error) {
             console.error(error);
             setMessage('An unexpected error occurred. Please try again later.');
         }
     };
-
 
     return (
       <div className="login-page">
