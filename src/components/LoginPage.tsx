@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ApiResponse, LoginResponse } from '../types/apiResponses';
+import ApiService from '../services/api';
+
+// TODO: Only issue with login is to keep the front end authorized when logged in
 
 interface LoginPageProps {
     setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,15 +13,21 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
     const [uniqueId, setUniqueId] = useState('');
     const [message, setMessage] = useState('');
 
-    const handleLogin = () => {
-        // Simulate a test case by checking if the unique ID matches a specific value
-        if (uniqueId === 'test123') {
-            setIsAuthenticated(true);
-            setMessage('');
-        } else {
-            setMessage('Login failed. Please check your ID and try again.');
+    const handleLogin = async () => {
+        try {
+            const response: ApiResponse<LoginResponse> = await ApiService.login(uniqueId);
+            if (response.status === 200 && response.data.status === 'success') {
+                setIsAuthenticated(true);
+                setMessage(response.data.message);
+            } else {
+                setMessage(response.data.message || 'Login failed. Please check your ID and try again.');
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage('An unexpected error occurred. Please try again later.');
         }
     };
+
 
     return (
       <div className="login-page">
@@ -33,7 +43,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
               <button onClick={handleLogin} className="ml-3">Login</button>
               {message && <p>{message}</p>}
               <div className="mt-2 flex items-center space-x-2">
-                  <p>Don't have an unique ID?</p>
+                  <p>Don't have a unique ID?</p>
                   <Link to="/register">
                       <button className="text-blue-600 underline">Register</button>
                   </Link>

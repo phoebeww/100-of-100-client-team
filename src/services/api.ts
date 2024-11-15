@@ -1,9 +1,6 @@
-const API_BASE_URL = 'http://localhost:8080'; 
+import { ApiResponse, LoginResponse } from '../types/apiResponses';
 
-interface ApiResponse<T> {
-  data: T;
-  status: number;
-}
+const API_BASE_URL = 'http://localhost:8080';
 
 class ApiService {
   private static async request<T>(
@@ -13,8 +10,9 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     const url = new URL(`${API_BASE_URL}${endpoint}`);
     
-    // Add query parameters for GET requests
-    if (method === 'GET' && params) {
+    // Add query parameters for all request
+    // TODO: should we add for all request?
+    if (params) {
       Object.keys(params).forEach(key => 
         url.searchParams.append(key, String(params[key]))
       );
@@ -28,13 +26,18 @@ class ApiService {
       // Add body for non-GET requests
       ...(method !== 'GET' && params ? { body: JSON.stringify(params) } : {})
     });
-
+    // console.log(response);
     const data = await response.json();
     return { data, status: response.status };
   }
 
+  // Login
+  static async login(clientId: string) {
+    return this.request<LoginResponse>('/login', 'POST', { cid: clientId });
+  }
+
   // Organization
-  static async getOrgInfo(clientId: number) {
+  static async getOrgInfo(clientId: string) {
     return this.request('/getOrgInfo', 'GET', { cid: clientId });
   }
 
