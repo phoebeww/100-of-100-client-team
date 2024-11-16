@@ -10,3 +10,9 @@ export interface LoginResponse {
   status: string;  // success/failed
   message: string; // message
 }
+
+export interface RegisterResponse {
+  status: string;
+  message: string;
+  token: string;
+}

@@ -1,4 +1,4 @@
-import { ApiResponse, LoginResponse } from '../types/apiResponses';
+import { ApiResponse, LoginResponse, RegisterResponse } from '../types/apiResponses';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -34,6 +34,11 @@ class ApiService {
   // Login
   static async login(clientId: string) {
     return this.request<LoginResponse>('/login', 'POST', { cid: clientId });
+  }
+
+  // Register
+  static async registerOrganization(name: string) {
+    return this.request<RegisterResponse>('/register', 'POST', { name });
   }
 
   // Organization

@@ -1,22 +1,31 @@
 import React, {useState} from 'react';
 import {Link} from "react-router-dom";
+import ApiService from "../services/api.ts";
 
 const RegisterPage: React.FC = () => {
   const [clientName, setClientName] = useState('');
   const [message, setMessage] = useState('');
   const [showLoginLink, setShowLoginLink] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (clientName) {
-      const mockId = 'test123';
-      // setGeneratedId(mockId);
-      setMessage('Registration successful! Your unique ID is: ' + mockId);
-      setShowLoginLink(true);
+      try {
+        const response = await ApiService.registerOrganization(clientName);
+        if (response.status === 201 && response.data.status === 'success') {
+          const clientId = response.data.token;
+          setMessage(`Registration successful! Your unique ID is: ${clientId}`);
+          setShowLoginLink(true);
+        } else {
+          setMessage(`Registration failed: ${response.data.message || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.log(error)
+        setMessage('Error: Unable to register. Please try again later.');
+      }
     } else {
       setMessage('Please enter your name.');
     }
   };
-  // above logic need to be replaced by the actual logic to call backend api
 
   return (
     <div className="register-page">
