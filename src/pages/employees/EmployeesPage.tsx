@@ -42,10 +42,10 @@ const EmployeesPage = () => {
           // Combine all employees from all departments
           const allEmployees = deptResponses.reduce((acc, response, index) => {
             if (response.status === 200) {
-              const deptName = orgResponse.data.departments[index].name;
+              const deptId = orgResponse.data.departments[index].id;
               const deptEmployees = response.data.employees.map(emp => ({
                 ...emp,
-                department: deptName
+                departmentId: deptId
               }));
               return [...acc, ...deptEmployees];
             }
@@ -111,6 +111,33 @@ const EmployeesPage = () => {
   );
 
   const sortedEmployees = sortEmployees(filteredEmployees);
+
+  // Handle delete employee
+  const handleDelete = async (employeeId: number, departmentId: number) => {
+    const clientId = localStorage.getItem('clientId');
+    if (!clientId) {
+      setError('No client ID found');
+      return;
+    }
+
+    try {
+      const response = await ApiService.removeEmployeeFromDepartment(
+        clientId,
+        departmentId,
+        employeeId
+      );
+      console.log(response);
+      if (response.status === 200) {
+        setEmployees(employees.filter(emp => emp.id !== employeeId));
+      } else {
+        setError('Failed to delete employee');
+      }
+    } catch (err) {
+      console.error('Error deleting employee:', err);
+      setError('Error connecting to server');
+    }
+  };
+
 
   if (loading) {
     return (
@@ -241,10 +268,11 @@ const EmployeesPage = () => {
                     <td className="py-3 px-4 text-right">${employee.salary.toLocaleString()}</td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex justify-end space-x-2">
-                        <button className="text-blue-600 hover:text-blue-800">
+                        <button className="text-blue-600 hover:text-blue-800" >
                           Edit
                         </button>
-                        <button className="text-red-600 hover:text-red-800">
+                        <button className="text-red-600 hover:text-red-800"
+                                onClick={() => handleDelete(employee.id, employee.departmentId)}>
                           Delete
                         </button>
                       </div>

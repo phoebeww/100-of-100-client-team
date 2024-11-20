@@ -46,9 +46,9 @@ class ApiService {
     return this.request<RegisterResponse>('/register', 'POST', { name });
   }
 
-static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
-  return this.request<Organization>('/getOrgInfo', 'GET', { cid: clientId });
-}
+  static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
+    return this.request<Organization>('/getOrgInfo', 'GET', { cid: clientId });
+  }
 
   // Department endpoints
   static async getDepartmentInfo(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentInfo>> {
@@ -74,6 +74,14 @@ static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
       cid: clientId, 
       did: departmentId.toString() 
     });
+  }
+
+  static async removeEmployeeFromDepartment(clientId: string, departmentId: number, employeeId: number): Promise<ApiResponse<BasicResponse>> {
+    return this.request<BasicResponse>('/removeEmpFromDept', 'DELETE', {
+      cid: clientId,
+      did: departmentId.toString(),
+      eid: employeeId.toString()
+    })
   }
 
 

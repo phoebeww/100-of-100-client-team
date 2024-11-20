@@ -22,7 +22,8 @@ export interface Employee {
   position: string;
   performance: number;
   salary: number;
-  department?: string; 
+  department?: string;
+  departmentId: number;
 }
 
 export interface Department {
