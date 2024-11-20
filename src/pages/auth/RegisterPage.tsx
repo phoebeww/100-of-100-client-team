@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import ApiService from "../services/api";
+import ApiService from "../../services/api";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const RegisterPage: React.FC = () => {

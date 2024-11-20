@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import { ApiResponse, LoginResponse } from '../types/apiResponses';
-import ApiService from '../services/api';
+import { ApiResponse, LoginResponse } from '../../types/apiResponses';
+import ApiService from '../../services/api';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface LoginPageProps {
@@ -24,6 +24,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
             const response: ApiResponse<LoginResponse> = await ApiService.login(uniqueId);
             if (response.status === 200 && response.data.status === 'success') {
                 setIsAuthenticated(true);
+                localStorage.setItem('clientId', uniqueId);
                 setMessage(response.data.message);
             } else {
                 setMessage('Login failed. Please check your ID and try again.');
