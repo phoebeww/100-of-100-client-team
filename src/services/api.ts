@@ -1,14 +1,14 @@
 const API_BASE_URL = 'http://localhost:8080';
-import { 
-  ApiResponse, 
-  LoginResponse, 
+import {
+  ApiResponse,
+  LoginResponse,
   RegisterResponse,
   Organization,
   DepartmentInfo,
   DepartmentBudgetStats,
   DepartmentPerfStats,
   DepartmentPosStats,
-  BasicResponse
+  BasicResponse, EmployeeInfo
 } from '../types/apiResponses';
 
 class ApiService {
@@ -73,6 +73,42 @@ class ApiService {
     return this.request<DepartmentPosStats>('/statDeptPos', 'GET', { 
       cid: clientId, 
       did: departmentId.toString() 
+    });
+  }
+
+  // Employee Endpoints
+  static async getEmployeeInfo(clientId: string, employeeId: number): Promise<ApiResponse<EmployeeInfo>> {
+    return this.request<EmployeeInfo>('/getEmpInfo', 'GET', {
+      cid: clientId,
+      eid: employeeId.toString()
+    })
+  }
+
+  static async addEmployeeToDepartment(clientId: string, departmentId: number, name: string, hireDate: string,
+    position: string = "", salary: number = 0, performance: number = 0
+  ): Promise<ApiResponse<EmployeeInfo>> {
+    return this.request<EmployeeInfo>('/addEmpToDept', 'POST', {
+      cid: clientId,
+      did: departmentId,
+      name,
+      hireDate,
+      position,
+      salary,
+      performance,
+    });
+  }
+
+  static async updateEmployeeInfo(clientId: string, employeeId: number,
+  updates: {
+    position?: string;
+    salary?: number;
+    performance?: number;
+  }
+  ): Promise<ApiResponse<string>> {
+    return this.request<string>('/updateEmpInfo', 'PATCH', {
+      cid: clientId,
+      eid: employeeId.toString(),
+      ...updates,
     });
   }
 
