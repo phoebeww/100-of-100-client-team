@@ -42,8 +42,10 @@ export interface Organization {
 }
 
 export interface DepartmentInfo {
+  id: number;
   name: string;
   head: string;
+  headId: number;
   employees: Employee[];
 }
 

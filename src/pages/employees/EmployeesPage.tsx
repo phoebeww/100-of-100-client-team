@@ -282,7 +282,10 @@ const EmployeesPage = () => {
                   <td className="py-3 px-4 text-right">${employee.salary.toLocaleString()}</td>
                   <td className="py-3 px-4 text-right">
                     <div className="flex justify-end space-x-2">
-                      <Link to={`/employees/edit/${employee.id}`}>
+                      <Link
+                        to={`/employees/edit/${employee.id}`}
+                        state={{ origin: 'employees' }}
+                      >
                         <button className="text-blue-600 hover:text-blue-800">Edit</button>
                       </Link>
                       <button className="text-red-600 hover:text-red-800"

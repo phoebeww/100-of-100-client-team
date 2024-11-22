@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import {useParams, useNavigate, useLocation, Link} from 'react-router-dom';
 import ApiService from '../../services/api';
+import {ArrowLeft} from "lucide-react";
 
 const EditEmployeePage = () => {
   const { id } = useParams<{ id: string }>(); // Get employee ID from URL params
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract state from location
+  const origin = location.state?.origin || 'employees'; // Default to 'employees'
+  const departmentId = location.state?.departmentId || null;
+
   const [employee, setEmployee] = useState<{
     position: string;
     salary: number | null;
@@ -28,7 +35,6 @@ const EditEmployeePage = () => {
 
       try {
         const response = await ApiService.getEmployeeInfo(clientId, parseInt(id, 10));
-        console.log(response);
         if (response.status === 200) {
           setEmployee({
             position: response.data.position || '',
@@ -44,7 +50,6 @@ const EditEmployeePage = () => {
       } finally {
         setLoading(false);
       }
-      console.log(employee);
     };
 
     fetchEmployeeData();
@@ -65,7 +70,12 @@ const EditEmployeePage = () => {
       });
 
       if (response.status === 200) {
-        navigate('/employees'); // Redirect to employees page after successful update
+        // Navigate back based on origin
+        if (origin === 'department') {
+          navigate(`/departments/${departmentId}/edit`);
+        } else {
+          navigate('/employees');
+        }
       } else {
         setError('Failed to update employee');
       }
@@ -81,6 +91,15 @@ const EditEmployeePage = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <div className="mb-6">
+        <Link
+          to={origin === 'department' ? `/departments/${departmentId}/edit` : '/employees'}
+          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1"/>
+          {origin === 'department' ? 'Back to Edit Department' : 'Back to Employees'}
+        </Link>
+      </div>
       <h1 className="text-2xl font-bold mb-4">Edit Employee</h1>
       {error && <p className="text-red-500">{error}</p>}
       <div>
@@ -122,12 +141,6 @@ const EditEmployeePage = () => {
           className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors inline-flex items-center mr-3"
         >
           Update
-        </button>
-        <button
-          onClick={() => navigate('/employees')}
-          className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400 transition-colors inline-flex items-center"
-        >
-          Back
         </button>
       </div>
     </div>

@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Building2, ArrowLeft, Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import ApiService from '../../services/api';
-import type { DepartmentInfo, Employee } from '../../types/apiResponses';
+import type { DepartmentInfo } from '../../types/apiResponses';
 
 const DepartmentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [departmentInfo, setDepartmentInfo] = useState<DepartmentInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ const DepartmentDetailPage = () => {
           setError('Failed to fetch department details');
         }
       } catch (err) {
+        console.log(err);
         setError('Error connecting to server');
       } finally {
         setLoading(false);
@@ -74,7 +76,8 @@ const DepartmentDetailPage = () => {
             <p className="text-gray-500">Department Head: {departmentInfo.head || 'Not assigned'}</p>
           </div>
         </div>
-        <button className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">
+        <button className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
+                onClick={() => navigate(`/departments/${departmentInfo.id}/edit`)}>
           Edit Department
         </button>
       </div>

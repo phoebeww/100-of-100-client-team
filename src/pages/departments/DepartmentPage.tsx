@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Users, DollarSign, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -25,6 +25,7 @@ const DepartmentsPage = () => {
         const response = await ApiService.getOrgInfo(clientId);
         if (response.status === 200) {
           setDepartments(response.data.departments || []);
+          console.log(response.data.departments);
         } else {
           setError('Failed to fetch departments');
         }

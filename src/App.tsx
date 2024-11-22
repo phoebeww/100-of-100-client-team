@@ -9,6 +9,7 @@ import DepartmentDetailPage from './pages/departments/DepartmentsDetailPage';
 import EmployeesPage from './pages/employees/EmployeesPage';
 import EditEmployeePage from "./pages/employees/EditEmployeePage.tsx";
 import AddEmployeePage from "./pages/employees/AddEmployeePage.tsx";
+import EditDepartmentPage from "./pages/departments/EditDepartmentPage.tsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -27,6 +28,7 @@ function App() {
             <Route path="/" element={<OrganizationPage />} />
             <Route path="/departments" element={<DepartmentPage />} />
             <Route path="/departments/:id" element={<DepartmentDetailPage />} />
+            <Route path="/departments/:id/edit" element={<EditDepartmentPage />} />
             <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/employees/edit/:id" element={<EditEmployeePage />} />
             <Route path="/employees/add" element={<AddEmployeePage />} />

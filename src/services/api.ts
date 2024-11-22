@@ -18,9 +18,9 @@ class ApiService {
     params?: Record<string, string | number>
   ): Promise<ApiResponse<T>> {
     const url = new URL(`${API_BASE_URL}${endpoint}`);
-    
+
     if (params) {
-      Object.keys(params).forEach(key => 
+      Object.keys(params).forEach(key =>
         url.searchParams.append(key, String(params[key]))
       );
     }
@@ -30,51 +30,64 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      ...(method !== 'GET' && params ? { body: JSON.stringify(params) } : {})
+      ...(method !== 'GET' && params ? {body: JSON.stringify(params)} : {})
     });
 
     const data = await response.json();
-    return { data, status: response.status };
+    return {data, status: response.status};
   }
 
   // Auth endpoints
   static async login(clientId: string): Promise<ApiResponse<LoginResponse>> {
-    return this.request<LoginResponse>('/login', 'POST', { cid: clientId });
+    return this.request<LoginResponse>('/login', 'POST', {cid: clientId});
   }
 
   static async registerOrganization(name: string): Promise<ApiResponse<RegisterResponse>> {
-    return this.request<RegisterResponse>('/register', 'POST', { name });
+    return this.request<RegisterResponse>('/register', 'POST', {name});
   }
 
   static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
-    return this.request<Organization>('/getOrgInfo', 'GET', { cid: clientId });
+    return this.request<Organization>('/getOrgInfo', 'GET', {cid: clientId});
   }
 
   // Department endpoints
   static async getDepartmentInfo(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentInfo>> {
-    return this.request<DepartmentInfo>('/getDeptInfo', 'GET', { cid: clientId, did: departmentId });
+    return this.request<DepartmentInfo>('/getDeptInfo', 'GET', {cid: clientId, did: departmentId});
   }
 
   static async getDepartmentBudgetStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentBudgetStats>> {
-    return this.request<DepartmentBudgetStats>('/statDeptBudget', 'GET', { 
-      cid: clientId, 
-      did: departmentId.toString() 
+    return this.request<DepartmentBudgetStats>('/statDeptBudget', 'GET', {
+      cid: clientId,
+      did: departmentId.toString()
     });
   }
 
   static async getDepartmentPerfStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentPerfStats>> {
-    return this.request<DepartmentPerfStats>('/statDeptPerf', 'GET', { 
-      cid: clientId, 
-      did: departmentId.toString() 
+    return this.request<DepartmentPerfStats>('/statDeptPerf', 'GET', {
+      cid: clientId,
+      did: departmentId.toString()
     });
   }
 
   static async getDepartmentPosStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentPosStats>> {
-    return this.request<DepartmentPosStats>('/statDeptPos', 'GET', { 
-      cid: clientId, 
-      did: departmentId.toString() 
+    return this.request<DepartmentPosStats>('/statDeptPos', 'GET', {
+      cid: clientId,
+      did: departmentId.toString()
     });
   }
+
+  static async setDepartmentHead(
+    clientId: string,
+    departmentId: number,
+    employeeId: number
+  ): Promise<ApiResponse<BasicResponse>> {
+    return this.request<BasicResponse>('/setDeptHead', 'PATCH', {
+      cid: clientId,
+      did: departmentId.toString(),
+      eid: employeeId.toString()
+    });
+  }
+
 
   // Employee Endpoints
   static async getEmployeeInfo(clientId: string, employeeId: number): Promise<ApiResponse<EmployeeInfo>> {
@@ -85,7 +98,7 @@ class ApiService {
   }
 
   static async addEmployeeToDepartment(clientId: string, departmentId: number, name: string, hireDate: string,
-    position: string = "", salary: number = 0, performance: number = 0
+                                       position: string = "", salary: number = 0, performance: number = 0
   ): Promise<ApiResponse<EmployeeInfo>> {
     return this.request<EmployeeInfo>('/addEmpToDept', 'POST', {
       cid: clientId,
@@ -99,11 +112,11 @@ class ApiService {
   }
 
   static async updateEmployeeInfo(clientId: string, employeeId: number,
-  updates: {
-    position?: string;
-    salary?: number;
-    performance?: number;
-  }
+                                  updates: {
+                                    position?: string;
+                                    salary?: number;
+                                    performance?: number;
+                                  }
   ): Promise<ApiResponse<string>> {
     return this.request<string>('/updateEmpInfo', 'PATCH', {
       cid: clientId,
