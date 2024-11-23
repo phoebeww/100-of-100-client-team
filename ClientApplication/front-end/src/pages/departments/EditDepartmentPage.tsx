@@ -3,8 +3,8 @@ import {Link, useNavigate, useParams} from 'react-router-dom';
 import {Users, Plus, Edit, Trash, ArrowLeft} from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import ApiService from '../../services/api';
-import type { Employee, DepartmentInfo } from '../../types/apiResponses';
+import ApiService from '../../services/api.ts';
+import type { Employee, DepartmentInfo } from '../../types/apiResponses.ts';
 
 const EditDepartmentPage = () => {
   const navigate = useNavigate();

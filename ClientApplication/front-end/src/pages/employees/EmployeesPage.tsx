@@ -2,8 +2,8 @@ import {useState, useEffect} from 'react';
 import {Users, Search, Plus, Filter, ArrowUpDown} from 'lucide-react';
 import {Card, CardHeader, CardTitle, CardContent} from '@/components/ui/card';
 import {Alert, AlertDescription} from '@/components/ui/alert';
-import ApiService from '../../services/api';
-import type {Employee, Department} from '../../types/apiResponses';
+import ApiService from '../../services/api.ts';
+import type {Employee, Department} from '../../types/apiResponses.ts';
 import {Link} from "react-router-dom";
 
 const EmployeesPage = () => {

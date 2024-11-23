@@ -38,7 +38,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, isAuthenticated, setI
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8 h-16 items-center">
             <Link
-              to="/ClientApplication/public"
+              to="/ClientApplication/front-end/publicend/public"
               className="flex items-center text-gray-700 hover:text-gray-900"
             >
               <LayoutDashboard className="w-5 h-5 mr-2" />

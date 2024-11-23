@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Building2, Users, DollarSign, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import ApiService from '../../services/api';
-import type { Department } from '../../types/apiResponses';
+import ApiService from '../../services/api.ts';
+import type { Department } from '../../types/apiResponses.ts';
 
 const DepartmentsPage = () => {
   const navigate = useNavigate();

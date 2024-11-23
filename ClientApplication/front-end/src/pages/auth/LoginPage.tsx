@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import { ApiResponse, LoginResponse } from '../../types/apiResponses';
-import ApiService from '../../services/api';
+import { ApiResponse, LoginResponse } from '../../types/apiResponses.ts';
+import ApiService from '../../services/api.ts';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface LoginPageProps {

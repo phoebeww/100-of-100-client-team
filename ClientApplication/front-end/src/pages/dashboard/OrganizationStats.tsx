@@ -5,7 +5,7 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import ApiService from "../../services/api";
+import ApiService from "../../services/api.ts";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DepartmentStatsProps {

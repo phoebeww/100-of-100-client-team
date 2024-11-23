@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Building2, DollarSign, TrendingUp, Users, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import ApiService from "../../services/api";
+import ApiService from "../../services/api.ts";
 import { 
   Department, 
   Employee, 
   DepartmentInfo, 
   Organization 
-} from '../../types/apiResponses';
-import DepartmentStats from './OrganizationStats';
+} from '../../types/apiResponses.ts';
+import DepartmentStats from './OrganizationStats.tsx';
 
 
 interface Stats {

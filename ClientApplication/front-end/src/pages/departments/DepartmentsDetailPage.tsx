@@ -3,8 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Building2, ArrowLeft, Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import ApiService from '../../services/api';
-import type { DepartmentInfo } from '../../types/apiResponses';
+import ApiService from '../../services/api.ts';
+import type { DepartmentInfo } from '../../types/apiResponses.ts';
 
 const DepartmentDetailPage = () => {
   const { id } = useParams<{ id: string }>();

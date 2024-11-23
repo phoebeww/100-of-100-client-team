@@ -9,7 +9,7 @@ import {
   DepartmentPerfStats,
   DepartmentPosStats,
   BasicResponse, EmployeeInfo
-} from '../types/apiResponses';
+} from '../types/apiResponses.ts';
 
 class ApiService {
   private static async request<T>(

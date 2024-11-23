@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import ApiService from "../../services/api";
+import ApiService from "../../services/api.ts";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const RegisterPage: React.FC = () => {
@@ -71,7 +71,7 @@ const RegisterPage: React.FC = () => {
                         <div className="text-center">
                             <p className="text-sm text-gray-500">
                                 Registration complete! Please{' '}
-                                <Link to="/ClientApplication/public" className="text-blue-600 hover:underline">
+                                <Link to="/ClientApplication/front-end/publicend/public" className="text-blue-600 hover:underline">
                                     login with your unique ID
                                 </Link>
                             </p>
@@ -82,7 +82,7 @@ const RegisterPage: React.FC = () => {
                         <div className="text-center">
                             <p className="text-sm text-gray-500">
                                 Already have an account?{' '}
-                                <Link to="/ClientApplication/public" className="text-blue-600 hover:underline">
+                                <Link to="/ClientApplication/front-end/publicend/public" className="text-blue-600 hover:underline">
                                     Login here
                                 </Link>
                             </p>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {useNavigate, useLocation, Link} from 'react-router-dom';
-import ApiService from '../../services/api';
-import type { Department } from '../../types/apiResponses';
+import ApiService from '../../services/api.ts';
+import type { Department } from '../../types/apiResponses.ts';
 import {ArrowLeft} from "lucide-react";
 
 const AddEmployeePage = () => {
