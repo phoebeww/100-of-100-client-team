@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Employee.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project</a> &gt; <span class="el_source">Employee.java</span></div><h1>Employee.java</h1><pre class="source lang-java linenums">package dev.coms4156.project;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * This class represents an employee in the organization.
+ * Designed under the Composite Design Pattern.
+ */
+public class Employee implements OrganizationComponent {
+  private final int id;
+  private final String name;
+  private final Date hireDate;
+  private String position;
+  private double salary;
+  private double performance;
+
+  /**
+   * Constructs an employee with the given ID, name, and hire date.
+   *
+   * @param id the ID of the employee (external ID)
+   * @param name the name of the employee
+   * @param hireDate the hire date of the employee
+   */
+<span class="fc" id="L28">  public Employee(int id, String name, Date hireDate) {</span>
+<span class="fc" id="L29">    this.id = id;</span>
+<span class="fc" id="L30">    this.name = name;</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">    if (hireDate == null) {</span>
+<span class="fc" id="L32">      this.hireDate = new Date();</span>
+    } else {
+<span class="fc" id="L34">      this.hireDate = new Date(hireDate.getTime());</span>
+    }
+<span class="fc" id="L36">    this.position = &quot;Other&quot;;</span>
+<span class="fc" id="L37">    this.salary = 0;</span>
+<span class="fc" id="L38">    this.performance = 0;</span>
+<span class="fc" id="L39">  }</span>
+
+  /**
+   * Full constructor for an employee with ID, name, hire date, position, salary, and performance.
+   * Primarily used by the database.
+   *
+   * @param id the ID of the employee (external ID)
+   * @param name the name of the employee
+   * @param hireDate the hire date of the employee
+   * @param position the position of the employee
+   * @param salary the current salary of the employee
+   * @param performance the performance of the employee
+   */
+  public Employee(
+      int id, String name, Date hireDate, String position, double salary, double performance
+<span class="fc" id="L54">  ) {</span>
+<span class="fc" id="L55">    this.id = id;</span>
+<span class="fc" id="L56">    this.name = name;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">    if (hireDate == null) {</span>
+<span class="nc" id="L58">      this.hireDate = new Date();</span>
+    } else {
+<span class="fc" id="L60">      this.hireDate = new Date(hireDate.getTime());</span>
+    }
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">    if (position == null || position.isEmpty()) {</span>
+<span class="fc" id="L63">      this.position = &quot;Other&quot;;</span>
+    } else {
+<span class="fc" id="L65">      this.position = position;</span>
+    }
+<span class="fc" id="L67">    this.salary = salary;</span>
+<span class="fc" id="L68">    this.performance = performance;</span>
+<span class="fc" id="L69">  }</span>
+
+  /**
+   * Returns the ID of the employee.
+   *
+   * @return the ID of the employee (external ID)
+   */
+  @Override
+  public int getId() {
+<span class="fc" id="L78">    return this.id;</span>
+  }
+
+  /**
+   * Returns the name of the employee.
+   *
+   * @return the name of the employee
+   */
+  @Override
+  public String getName() {
+<span class="fc" id="L88">    return this.name;</span>
+  }
+
+  /**
+   * Returns the type name of the employee.
+   *
+   * @return the type name of the employee
+   */
+  @Override
+  public String getTypeName() {
+<span class="fc" id="L98">    return &quot;Employee&quot;;</span>
+  }
+
+  /**
+   * Returns the child structure of the employee.
+   *
+   * @return an empty list
+   */
+  @Override
+  public List&lt;OrganizationComponent&gt; getChildren() {
+<span class="fc" id="L108">    return new ArrayList&lt;&gt;();</span>
+  }
+
+  /**
+   * Returns the hire date of the employee.
+   *
+   * @return the hire date of the employee
+   */
+  public Date getHireDate() {
+<span class="fc" id="L117">    return new Date(this.hireDate.getTime());</span>
+  }
+
+  /**
+   * Returns the position of the employee.
+   *
+   * @return the position of the employee
+   */
+  public String getPosition() {
+<span class="fc" id="L126">    return this.position;</span>
+  }
+
+  /**
+   * Sets the position of the employee.
+   *
+   * @param position the position of the employee
+   */
+  public void setPosition(String position) {
+<span class="fc" id="L135">    this.position = position;</span>
+<span class="fc" id="L136">  }</span>
+
+  /**
+   * Returns the salary of the employee.
+   *
+   * @return the salary of the employee
+   */
+  public double getSalary() {
+<span class="fc" id="L144">    return this.salary;</span>
+  }
+
+  /**
+   * Sets the salary of the employee.
+   *
+   * @param salary the new salary of the employee
+   */
+  public void setSalary(double salary) {
+<span class="fc" id="L153">    this.salary = salary;</span>
+<span class="fc" id="L154">  }</span>
+
+  /**
+   * Returns the performance of the employee.
+   *
+   * @return the performance of the employee
+   */
+  public double getPerformance() {
+<span class="fc" id="L162">    return this.performance;</span>
+  }
+
+  /**
+   * Sets the performance of the employee.
+   *
+   * @param performance the new performance of the employee
+   */
+  public void setPerformance(double performance) {
+<span class="fc" id="L171">    this.performance = performance;</span>
+<span class="fc" id="L172">  }</span>
+
+  /**
+   * Report all the information of the employee in a JSON format.
+   *
+   * @return a Map of the employee information that can be easily converted to JSON
+   */
+  public Map&lt;String, Object&gt; toJson() {
+<span class="fc" id="L180">    Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L181">    result.put(&quot;ID&quot;, this.id);</span>
+<span class="fc" id="L182">    result.put(&quot;name&quot;, this.name);</span>
+<span class="fc" id="L183">    result.put(&quot;hireDate&quot;, this.hireDate);</span>
+<span class="fc" id="L184">    result.put(&quot;position&quot;, this.position);</span>
+<span class="fc" id="L185">    result.put(&quot;salary&quot;, this.salary);</span>
+<span class="fc" id="L186">    result.put(&quot;performance&quot;, this.performance);</span>
+<span class="fc" id="L187">    result.put(&quot;representation&quot;, this.toString());</span>
+<span class="fc" id="L188">    return result;</span>
+  }
+
+  /**
+   * Returns the basic information of the employee, including the name and ID.
+   *
+   * @return the string representation of the employee
+   */
+  @Override
+  public String toString() {
+<span class="fc" id="L198">    return &quot;Employee: &quot; + this.name + &quot; (ID: &quot; + this.id + &quot;)&quot; + &quot; Hired at: &quot; + this.hireDate;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HrDatabaseFacade.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project</a> &gt; <span class="el_source">HrDatabaseFacade.java</span></div><h1>HrDatabaseFacade.java</h1><pre class="source lang-java linenums">package dev.coms4156.project;
+
+import dev.coms4156.project.exception.NotFoundException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * A singleton class of HR database facade.
+ * This class is responsible for creating and managing the connection to the HR database.
+ * Designed under the Singleton Design Pattern.
+ */
+public class HrDatabaseFacade {
+<span class="fc" id="L16">  private static final Logger logger = LoggerFactory.getLogger(HrDatabaseFacade.class);</span>
+<span class="fc" id="L17">  private static final Map&lt;Integer, HrDatabaseFacade&gt; instances = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L18">  private static DatabaseConnection dbConnection = null;</span>
+
+  private final int organizationId;
+  private List&lt;Employee&gt; employees;
+  private List&lt;Department&gt; departments;
+  private Organization organization;
+
+  /**
+   * Constructs an HR database facade instance for a specific organization.
+   *
+   * @param organizationId the organization id
+   */
+<span class="fc" id="L30">  private HrDatabaseFacade(int organizationId) {</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">    if (dbConnection == null) {</span>
+<span class="nc" id="L32">      throw new IllegalStateException(&quot;Database connection is not initialized&quot;);</span>
+    }
+<span class="fc" id="L34">    this.organizationId = organizationId;</span>
+    // Initialize the in-memory cache
+<span class="fc" id="L36">    this.organization = dbConnection.getOrganization(organizationId);</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">    if (this.organization == null) {</span>
+<span class="fc" id="L38">      logger.warn(&quot;Organization not found: {}&quot;, organizationId);</span>
+<span class="fc" id="L39">      throw new NotFoundException(&quot;Organization not found&quot;);</span>
+    }
+<span class="fc" id="L41">    this.departments = dbConnection.getDepartments(organizationId);</span>
+<span class="fc" id="L42">    this.organization.setDepartments(this.departments);</span>
+<span class="fc" id="L43">    this.employees = dbConnection.getEmployees(organizationId);</span>
+<span class="fc" id="L44">    this.organization.setEmployees(this.employees);</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * Returns the employee with the specified ID.
+   *
+   * @param employeeId the employee ID
+   * @return the employee
+   */
+  public Employee getEmployee(int employeeId) {
+    // Check the in-memory cache
+<span class="fc" id="L55">    Employee employee = employees</span>
+<span class="fc" id="L56">            .stream()</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            .filter(e -&gt; e.getId() == employeeId)</span>
+<span class="fc" id="L58">            .findFirst()</span>
+<span class="fc" id="L59">            .orElse(null);</span>
+
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (employee == null) {</span>
+      // If not found in cache, query the database
+<span class="fc" id="L63">      List&lt;Employee&gt; updatedEmployees = dbConnection.getEmployees(this.organizationId);</span>
+<span class="fc" id="L64">      employee = updatedEmployees</span>
+<span class="fc" id="L65">              .stream()</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">              .filter(e -&gt; e.getId() == employeeId)</span>
+<span class="fc" id="L67">              .findFirst()</span>
+<span class="fc" id="L68">              .orElse(null);</span>
+
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">      if (employee != null) {</span>
+        // Update the cache
+<span class="nc" id="L72">        this.employees = updatedEmployees;</span>
+      }
+    }
+
+<span class="fc" id="L76">    return employee;</span>
+  }
+
+  /**
+   * Returns the department with the specified ID.
+   *
+   * @param departmentId the department ID
+   * @return the department
+   */
+  public Department getDepartment(int departmentId) {
+    // Check the in-memory cache
+<span class="fc" id="L87">    Department department = departments</span>
+<span class="fc" id="L88">            .stream()</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            .filter(d -&gt; d.getId() == departmentId)</span>
+<span class="fc" id="L90">            .findFirst()</span>
+<span class="fc" id="L91">            .orElse(null);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    if (department != null) {</span>
+<span class="fc" id="L93">      System.out.println(department.toJson());</span>
+    }
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (department == null) {</span>
+      // If not found in cache, query the database
+<span class="fc" id="L98">      List&lt;Department&gt; updatedDepartments = dbConnection.getDepartments(this.organizationId);</span>
+<span class="fc" id="L99">      department = updatedDepartments</span>
+<span class="fc" id="L100">              .stream()</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">              .filter(d -&gt; d.getId() == departmentId)</span>
+<span class="fc" id="L102">              .findFirst()</span>
+<span class="fc" id="L103">              .orElse(null);</span>
+
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">      if (department != null) {</span>
+        // Update the cache
+<span class="nc" id="L107">        this.departments = updatedDepartments;</span>
+      }
+    }
+
+<span class="fc" id="L111">    return department;</span>
+  }
+
+  /**
+   * Returns the organization of the client.
+   *
+   * @return the organization
+   */
+  public Organization getOrganization() {
+    // Check the in-memory cache (this.organization was initialized in constructor)
+<span class="fc" id="L121">    return organization;</span>
+  }
+
+  /**
+   * Updates the employee information.
+   *
+   * @param employee the updated employee object
+   * @return true if the employee is updated successfully, false otherwise
+   */
+  public boolean updateEmployee(Employee employee) {
+<span class="fc" id="L131">    boolean success = dbConnection.updateEmployee(this.organizationId, employee);</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">    if (success) {</span>
+      // Update organization-level employee cache
+<span class="fc" id="L134">      this.employees = dbConnection.getEmployees(this.organizationId);</span>
+
+      // Update department-level employee cache
+<span class="fc bfc" id="L137" title="All 2 branches covered.">      for (Department department : this.departments) {</span>
+<span class="fc" id="L138">        List&lt;Employee&gt; deptEmployees = department.getEmployees();</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        for (int i = 0; i &lt; deptEmployees.size(); i++) {</span>
+<span class="fc" id="L140">          Employee deptEmployee = deptEmployees.get(i);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">          if (deptEmployee.getId() == employee.getId()) {</span>
+            // replace the employee in the department cache
+<span class="fc" id="L143">            deptEmployees.set(i, employee);</span>
+<span class="fc" id="L144">            break;</span>
+          }
+        }
+<span class="fc" id="L147">      }</span>
+//      System.out.println(&quot;Updated Employee List:&quot;);
+//      for (Employee emp : this.employees) {
+//        System.out.println(emp.toJson());
+//      }
+    }
+<span class="fc" id="L153">    return success;</span>
+  }
+
+  /**
+   * Updates the department information.
+   *
+   * @param department the updated department object
+   * @return true if the department is updated successfully, false otherwise
+   */
+  public boolean updateDepartment(Department department) {
+<span class="fc" id="L163">    boolean success = dbConnection.updateDepartment(this.organizationId, department);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (success) {</span>
+<span class="fc" id="L165">      List&lt;Department&gt; updatedDepartments = dbConnection.getDepartments(this.organizationId);</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">      for (Department dept: updatedDepartments) {</span>
+<span class="fc" id="L167">        System.out.println(dept.toJson());</span>
+<span class="fc" id="L168">      }</span>
+<span class="fc" id="L169">      this.organization.setDepartments(updatedDepartments);</span>
+<span class="fc" id="L170">      this.departments = updatedDepartments;</span>
+    }
+<span class="fc" id="L172">    return success;</span>
+  }
+
+    /**
+     * Updates the organization information.
+     *
+     * @param organization the updated organization object
+     * @return true if the organization is updated successfully, false otherwise
+     */
+  public boolean updateOrganization(Organization organization) {
+<span class="nc" id="L182">    boolean success = dbConnection.updateOrganization(organization);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">    if (success) {</span>
+      // Update the in-memory cache
+<span class="nc" id="L185">      this.organization = organization;</span>
+    }
+<span class="nc" id="L187">    return success;</span>
+  }
+
+  /**
+   * Adds a new employee to a department.
+   *
+   * @param departmentId the department ID
+   * @param employee the employee to add
+   * @return the added employee with assigned ID, or null if failed
+   */
+  public Employee addEmployeeToDepartment(int departmentId, Employee employee) {
+<span class="fc" id="L198">    int internalDeptId = this.organizationId * 10000 + departmentId;</span>
+<span class="fc" id="L199">    int internalEmpId = dbConnection</span>
+<span class="fc" id="L200">            .addEmployeeToDepartment(this.organizationId, internalDeptId, employee);</span>
+
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">    if (internalEmpId != -1) {</span>
+<span class="fc" id="L203">      int externalEmpId = internalEmpId % 10000;</span>
+
+<span class="fc" id="L205">      Employee newEmployee = new Employee(</span>
+              externalEmpId,
+<span class="fc" id="L207">              employee.getName(),</span>
+<span class="fc" id="L208">              employee.getHireDate(),</span>
+<span class="fc" id="L209">              employee.getPosition(),</span>
+<span class="fc" id="L210">              employee.getSalary(),</span>
+<span class="fc" id="L211">              employee.getPerformance()</span>
+      );
+<span class="fc" id="L213">      System.out.println(newEmployee.toJson());</span>
+
+      // Update the in-memory cache
+<span class="fc" id="L216">      this.employees = dbConnection.getEmployees(this.organizationId);</span>
+      // This is added for update department-level cache
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">      for (Department department : this.departments) {</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">        if (department.getId() == departmentId) {</span>
+<span class="fc" id="L220">          department.addEmployee(newEmployee);</span>
+<span class="fc" id="L221">          break;</span>
+        }
+<span class="nc" id="L223">      }</span>
+//      this.departments = dbConnection.getDepartments(this.organizationId);
+
+<span class="fc" id="L226">      return newEmployee;</span>
+    }
+<span class="nc" id="L228">    return null;</span>
+  }
+
+
+    /**
+     * Inserts a new department into the database.
+     *
+     * @param department the partially filled department object
+     * @return the real department object with the ID assigned
+     */
+  public Department insertDepartment(Department department) {
+<span class="nc" id="L239">    Department newDepartment = dbConnection.insertDepartment(this.organizationId, department);</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    if (newDepartment != null) {</span>
+      // Update the in-memory cache
+<span class="nc" id="L242">      this.departments.add(newDepartment);</span>
+    }
+<span class="nc" id="L244">    return newDepartment;</span>
+  }
+
+  /**
+   * Removes an employee from a department.
+   *
+   * @param departmentId the department ID
+   * @param employeeId the employee ID
+   * @return true if the employee is removed successfully, false otherwise
+   */
+  public boolean removeEmployeeFromDepartment(int departmentId, int employeeId) {
+<span class="fc" id="L255">    int internalDeptId = this.organizationId * 10000 + departmentId;</span>
+<span class="fc" id="L256">    int internalEmpId = this.organizationId * 10000 + employeeId;</span>
+
+<span class="fc" id="L258">    boolean success = dbConnection.removeEmployeeFromDepartment(</span>
+            this.organizationId,
+            internalDeptId,
+            internalEmpId
+    );
+
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">    if (success) {</span>
+      // Update the in-memory cache
+<span class="fc" id="L266">      this.employees = dbConnection.getEmployees(this.organizationId);</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">      for (Department department : this.departments) {</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">        if (department.getId() == departmentId) {</span>
+<span class="fc" id="L269">          Employee employeeToRemove = this.employees</span>
+<span class="fc" id="L270">            .stream()</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">            .filter(emp -&gt; emp.getId() == employeeId)</span>
+<span class="fc" id="L272">            .findFirst()</span>
+<span class="fc" id="L273">            .orElse(null);</span>
+
+<span class="pc bpc" id="L275" title="1 of 2 branches missed.">          if (employeeToRemove != null) {</span>
+<span class="nc" id="L276">            department.removeEmployee(employeeToRemove);</span>
+          }
+          break;
+        }
+<span class="nc" id="L280">      }</span>
+//      this.departments = dbConnection.getDepartments(this.organizationId);
+    }
+
+<span class="fc" id="L284">    return success;</span>
+  }
+
+    /**
+     * Removes a department from the database.
+     *
+     * @param departmentId the department ID
+     * @return true if the department is removed successfully, false otherwise
+     */
+  public boolean removeDepartment(int departmentId) {
+<span class="nc" id="L294">    boolean success = dbConnection.removeDepartment(this.organizationId, departmentId);</span>
+<span class="nc bnc" id="L295" title="All 2 branches missed.">    if (success) {</span>
+      // Update the in-memory cache
+<span class="nc bnc" id="L297" title="All 2 branches missed.">      this.departments.removeIf(dept -&gt; dept.getId() == departmentId);</span>
+    }
+<span class="nc" id="L299">    return success;</span>
+  }
+
+
+  // TODO: How to insert(register) / remove(deregister) an organization?
+
+  public static Organization insertOrganization(Organization organization) {
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">    if (dbConnection == null) {</span>
+<span class="nc" id="L307">      throw new IllegalStateException(&quot;Database connection is not initialized&quot;);</span>
+    }
+<span class="fc" id="L309">    Organization newOrganization = dbConnection.insertOrganization(organization);</span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">    if (newOrganization != null) {</span>
+      // Create a new instance of HrDatabaseFacade for the new organization
+<span class="fc" id="L312">      synchronized (HrDatabaseFacade.class) {</span>
+<span class="fc" id="L313">        instances.put(newOrganization.getId(), new HrDatabaseFacade(newOrganization.getId()));</span>
+<span class="fc" id="L314">      }</span>
+    }
+<span class="fc" id="L316">    return newOrganization;</span>
+  }
+
+
+  public static boolean removeOrganization(int organizationId) {
+<span class="nc bnc" id="L321" title="All 2 branches missed.">    if (dbConnection == null) {</span>
+<span class="nc" id="L322">      throw new IllegalStateException(&quot;Database connection is not initialized&quot;);</span>
+    }
+<span class="nc" id="L324">    boolean success = dbConnection.removeOrganization(organizationId);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">    if (success) {</span>
+      // Remove the HrDatabaseFacade instance for the organization
+<span class="nc" id="L327">      synchronized (HrDatabaseFacade.class) {</span>
+<span class="nc" id="L328">        instances.remove(organizationId);</span>
+<span class="nc" id="L329">      }</span>
+    }
+<span class="nc" id="L331">    return success;</span>
+  }
+
+
+  /**
+   * Returns the unique instance of the HR database facade for a specific organization.
+   * Designed with &quot;double-checked locking&quot; mechanism to ensure thread safety.
+   *
+   * @param organizationId the organization id
+   * @return the HR database facade instance
+   */
+  public static HrDatabaseFacade getInstance(int organizationId) {
+<span class="fc bfc" id="L343" title="All 2 branches covered.">    if (!instances.containsKey(organizationId)) {</span>
+<span class="fc" id="L344">      synchronized (HrDatabaseFacade.class) {</span>
+<span class="pc bpc" id="L345" title="1 of 2 branches missed.">        if (!instances.containsKey(organizationId)) {</span>
+<span class="fc" id="L346">          instances.put(organizationId, new HrDatabaseFacade(organizationId));</span>
+        }
+<span class="fc" id="L348">      }</span>
+    }
+<span class="fc" id="L350">    return instances.get(organizationId);</span>
+  }
+
+  /**
+   * Sets the database connection for the HR database facade.
+   * Notice: This method must be called before any other methods.
+   *
+   * @param databaseConnection the concrete database connection object
+   */
+  public static void setConnection(DatabaseConnection databaseConnection) {
+<span class="fc" id="L360">    dbConnection = databaseConnection;</span>
+<span class="fc" id="L361">    logger.info(&quot;Database connection is set to: {}&quot;, dbConnection.connectionName());</span>
+<span class="fc" id="L362">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

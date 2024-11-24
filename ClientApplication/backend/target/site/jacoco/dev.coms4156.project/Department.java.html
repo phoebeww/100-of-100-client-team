@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Department.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project</a> &gt; <span class="el_source">Department.java</span></div><h1>Department.java</h1><pre class="source lang-java linenums">package dev.coms4156.project;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * This class represents a department in the organization.
+ * Designed under the Composite Design Pattern.
+ */
+public class Department extends OrganizationComposite {
+  private Employee head;
+  private final List&lt;Employee&gt; employees;
+
+  /**
+   * Constructs a department with the given ID and name.
+   *
+   * @param id the ID of the department (external ID)
+   * @param name the name of the department
+   */
+  public Department(int id, String name) {
+<span class="fc" id="L23">    super(id, name);</span>
+<span class="fc" id="L24">    this.typeName = &quot;Department&quot;;</span>
+<span class="fc" id="L25">    this.employees = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L26">    this.head = null;</span>
+<span class="fc" id="L27">  }</span>
+
+  /**
+   * Constructs a department with the given ID, name, and list of employees.
+   *
+   * @param id   the ID of the department (external ID)
+   * @param name the name of the department
+   * @param employees the list of existing employees in the department
+   */
+  public Department(int id, String name, List&lt;Employee&gt; employees) {
+<span class="fc" id="L37">    super(id, name);</span>
+<span class="fc" id="L38">    this.typeName = &quot;Department&quot;;</span>
+<span class="fc" id="L39">    this.employees = employees;</span>
+<span class="fc" id="L40">    this.head = null;</span>
+<span class="fc" id="L41">  }</span>
+
+  /**
+   * Adds an employee to the department.
+   *
+   * @param employee the employee to be added
+   * @return true if the employee is added successfully, false otherwise
+   */
+  public boolean addEmployee(Employee employee) {
+<span class="fc" id="L50">    this.employees.add(employee); // Add to employee list</span>
+<span class="fc" id="L51">    return this.add(employee);</span>
+  }
+
+  /**
+   * Removes an employee from the department.
+   *
+   * @param employee the employee to be removed
+   * @return true if the employee is removed successfully, false otherwise
+   */
+  public boolean removeEmployee(Employee employee) {
+<span class="fc" id="L61">    this.employees.remove(employee); // Remove from employee list</span>
+<span class="fc" id="L62">    return this.remove(employee);</span>
+  }
+
+  /**
+   * Returns the list of employees in the department.
+   *
+   * @return the list of employees
+   */
+  public List&lt;Employee&gt; getEmployees() {
+    // We choose to return the list itself, not a copy, for performance reasons
+    // caller can make the decision to copy the list if needed
+<span class="fc" id="L73">    return this.employees;</span>
+  }
+
+  /**
+   * Returns the head of the department.
+   *
+   * @return the head of the department
+   */
+  public Employee getHead() {
+<span class="fc" id="L82">    return this.head;</span>
+  }
+
+  /**
+   * Sets the head of the department.
+   *
+   * @param head the head of the department
+   * @return true if the validation passes, false otherwise
+   */
+  public boolean setHead(Employee head) {
+    // TODO: Any validation? Manager must in the department?
+<span class="fc" id="L93">    this.head = head;</span>
+<span class="fc" id="L94">    return true;</span>
+  }
+  /**
+   * Returns a statistic of the employees' positions in the department.
+   * @return a Map of the statistic that can be easily converted to JSON
+   */
+  public Map&lt;String, Integer&gt; getEmployeePositionStatisticMap() {
+<span class="fc" id="L101">    Map&lt;String, Integer&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    for (Employee e : this.employees) {</span>
+<span class="fc" id="L103">      String position = e.getPosition();</span>
+<span class="pc bpc" id="L104" title="2 of 4 branches missed.">      position = (position == null || position.trim().isEmpty()) ? &quot;unassigned&quot; : position.trim().toLowerCase();</span>
+<span class="fc" id="L105">      result.put(position, result.getOrDefault(position, 0) + 1);</span>
+<span class="fc" id="L106">    }</span>
+<span class="fc" id="L107">    return result;</span>
+  }
+
+  /**
+   * Returns a statistic of the employees' salaries in the department.
+   * @return a Map of the statistic that can be easily converted to JSON
+   */
+  public Map&lt;String, Object&gt; getEmployeeSalaryStatisticMap() {
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    if (this.employees.isEmpty()) {</span>
+<span class="nc" id="L116">      Map&lt;String, Object&gt; emptyResult = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L117">      emptyResult.put(&quot;total&quot;, 0.0);</span>
+<span class="nc" id="L118">      emptyResult.put(&quot;average&quot;, 0.0);</span>
+<span class="nc" id="L119">      emptyResult.put(&quot;highest&quot;, 0.0);</span>
+<span class="nc" id="L120">      emptyResult.put(&quot;lowest&quot;, 0.0);</span>
+<span class="nc" id="L121">      emptyResult.put(&quot;highestEmployee&quot;, null);</span>
+<span class="nc" id="L122">      emptyResult.put(&quot;lowestEmployee&quot;, null);</span>
+<span class="nc" id="L123">      return emptyResult;</span>
+    }
+
+<span class="fc" id="L126">    double totalSalary = 0.0;</span>
+<span class="fc" id="L127">    double highestSalary = Double.MIN_VALUE;</span>
+<span class="fc" id="L128">    double lowestSalary = Double.MAX_VALUE;</span>
+<span class="fc" id="L129">    Employee highestEmployee = null;</span>
+<span class="fc" id="L130">    Employee lowestEmployee = null;</span>
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (Employee e : this.employees) {</span>
+<span class="fc" id="L133">      double salary = e.getSalary();</span>
+
+<span class="fc" id="L135">      totalSalary += salary;</span>
+
+<span class="fc bfc" id="L137" title="All 2 branches covered.">      if (salary &gt; highestSalary) {</span>
+<span class="fc" id="L138">        highestSalary = salary;</span>
+<span class="fc" id="L139">        highestEmployee = e;</span>
+      }
+
+<span class="fc bfc" id="L142" title="All 2 branches covered.">      if (salary &lt; lowestSalary) {</span>
+<span class="fc" id="L143">        lowestSalary = salary;</span>
+<span class="fc" id="L144">        lowestEmployee = e;</span>
+      }
+<span class="fc" id="L146">    }</span>
+
+<span class="fc" id="L148">    double averageSalary = totalSalary / this.employees.size();</span>
+
+<span class="fc" id="L150">    Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L151">    result.put(&quot;total&quot;, totalSalary);</span>
+<span class="fc" id="L152">    result.put(&quot;average&quot;, averageSalary);</span>
+<span class="fc" id="L153">    result.put(&quot;highest&quot;, highestSalary);</span>
+<span class="fc" id="L154">    result.put(&quot;lowest&quot;, lowestSalary);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    result.put(&quot;highestEmployee&quot;, highestEmployee != null ? highestEmployee.getId() : null);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    result.put(&quot;lowestEmployee&quot;, lowestEmployee != null ? lowestEmployee.getId() : null);</span>
+<span class="fc" id="L157">    return result;</span>
+  }
+
+  /**
+   * Returns a statistic of the employees' performance in the department.
+   * @return a Map of the statistic that can be easily converted to JSON
+   */
+  public Map&lt;String, Object&gt; getEmployeePerformanceStatisticMap() {
+<span class="fc" id="L165">    Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</span>
+
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">    if (this.employees.isEmpty()) {</span>
+<span class="nc" id="L168">      result.put(&quot;highest&quot;, 0.0);</span>
+<span class="nc" id="L169">      result.put(&quot;percentile25&quot;, 0.0);</span>
+<span class="nc" id="L170">      result.put(&quot;median&quot;, 0.0);</span>
+<span class="nc" id="L171">      result.put(&quot;percentile75&quot;, 0.0);</span>
+<span class="nc" id="L172">      result.put(&quot;lowest&quot;, 0.0);</span>
+<span class="nc" id="L173">      result.put(&quot;average&quot;, 0.0);</span>
+<span class="nc" id="L174">      result.put(&quot;sortedEmployeeIds&quot;, new int[0]);</span>
+<span class="nc" id="L175">      return result;</span>
+    }
+
+<span class="fc" id="L178">    List&lt;Double&gt; performances = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">    for (Employee e : this.employees) {</span>
+<span class="fc" id="L180">      performances.add(e.getPerformance());</span>
+<span class="fc" id="L181">    }</span>
+<span class="fc" id="L182">    performances.sort(Double::compareTo);</span>
+
+<span class="fc" id="L184">    int size = performances.size();</span>
+<span class="fc" id="L185">    double highest = performances.get(size - 1);</span>
+<span class="fc" id="L186">    double lowest = performances.get(0);</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">    double median = size % 2 == 0</span>
+<span class="fc" id="L188">            ? (performances.get(size / 2 - 1) + performances.get(size / 2)) / 2</span>
+<span class="fc" id="L189">            : performances.get(size / 2);</span>
+
+    // Calculate quartiles safely
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">    double q1 = size &lt; 4 ? lowest : performances.get(Math.max(0, (size - 1) / 4));</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">    double q3 = size &lt; 4 ? highest : performances.get(Math.min(size - 1, (size - 1) * 3 / 4));</span>
+
+    // Calculate average
+<span class="fc" id="L196">    double average = performances.stream()</span>
+<span class="fc" id="L197">            .mapToDouble(Double::doubleValue)</span>
+<span class="fc" id="L198">            .average()</span>
+<span class="fc" id="L199">            .orElse(0.0);</span>
+
+<span class="fc" id="L201">    result.put(&quot;highest&quot;, highest);</span>
+<span class="fc" id="L202">    result.put(&quot;percentile25&quot;, q1);</span>
+<span class="fc" id="L203">    result.put(&quot;median&quot;, median);</span>
+<span class="fc" id="L204">    result.put(&quot;percentile75&quot;, q3);</span>
+<span class="fc" id="L205">    result.put(&quot;lowest&quot;, lowest);</span>
+<span class="fc" id="L206">    result.put(&quot;average&quot;, average);</span>
+
+    // Sort employees by performance (descending) and get their IDs
+<span class="fc" id="L209">    int[] sortedIds = this.employees.stream()</span>
+<span class="fc" id="L210">            .sorted((e1, e2) -&gt; Double.compare(e2.getPerformance(), e1.getPerformance()))</span>
+<span class="fc" id="L211">            .mapToInt(Employee::getId)</span>
+<span class="fc" id="L212">            .toArray();</span>
+<span class="fc" id="L213">    result.put(&quot;sortedEmployeeIds&quot;, sortedIds);</span>
+
+<span class="fc" id="L215">    return result;</span>
+  }
+
+  /**
+   * Report all the information of the department in a JSON format.
+   *
+   * @return a Map of the information that can be easily converted to JSON
+   */
+  public Map&lt;String, Object&gt; toJson() {
+<span class="fc" id="L224">    Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L225">    result.put(&quot;id&quot;, this.id);</span>
+<span class="fc" id="L226">    result.put(&quot;name&quot;, this.name);</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">    result.put(&quot;head&quot;, this.head != null ? this.head.getName() : &quot;&quot;);</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">    result.put(&quot;headId&quot;, this.head != null ? this.head.getId() : &quot;&quot;);</span>
+<span class="fc" id="L229">    result.put(&quot;employeeCount&quot;, this.employees.size());</span>
+
+    // Add detailed employee information if needed
+<span class="fc" id="L232">    List&lt;Map&lt;String, Object&gt;&gt; employeesList = this.employees.stream().map(emp -&gt; {</span>
+<span class="fc" id="L233">      Map&lt;String, Object&gt; empInfo = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L234">      empInfo.put(&quot;id&quot;, emp.getId());</span>
+<span class="fc" id="L235">      empInfo.put(&quot;name&quot;, emp.getName());</span>
+<span class="fc" id="L236">      empInfo.put(&quot;position&quot;, emp.getPosition());</span>
+<span class="fc" id="L237">      empInfo.put(&quot;performance&quot;, emp.getPerformance());</span>
+<span class="fc" id="L238">      empInfo.put(&quot;salary&quot;, emp.getSalary());</span>
+<span class="fc" id="L239">      return empInfo;</span>
+<span class="fc" id="L240">    }).toList();</span>
+<span class="fc" id="L241">    result.put(&quot;employees&quot;, employeesList);</span>
+
+<span class="fc" id="L243">    return result;</span>
+  }
+
+  /**
+   * Returns the basic information of the Department,
+   * including the name, ID, list of employees, and head.
+   *
+   * @return the string representation of the department
+   */
+  @Override
+  public String toString() {
+<span class="fc" id="L254">    StringBuilder sb = new StringBuilder();</span>
+
+    // add employee infos in the toString()
+<span class="fc" id="L257">    sb.append(&quot;Department: &quot;).append(this.name).append(&quot; (ID: &quot;).append(this.id).append(&quot;)&quot;);</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">    if (this.head != null) {</span>
+<span class="fc" id="L259">      sb.append(&quot; Head: &quot;).append(this.head.getName());</span>
+    }
+
+<span class="fc bfc" id="L262" title="All 2 branches covered.">    if (!this.employees.isEmpty()) {</span>
+<span class="fc" id="L263">      sb.append(&quot;\n  Employees:&quot;);  // Indent employees section</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">      for (Employee employee : this.employees) {</span>
+<span class="fc" id="L265">        sb.append(&quot;\n    - &quot;).append(employee.getName())</span>
+<span class="fc" id="L266">          .append(&quot; (ID: &quot;).append(employee.getId()).append(&quot;)&quot;);</span>
+<span class="fc" id="L267">      }</span>
+    } else {
+<span class="fc" id="L269">      sb.append(&quot;\n  No employees in this department.&quot;);</span>
+    }
+
+<span class="fc" id="L272">    return sb.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
