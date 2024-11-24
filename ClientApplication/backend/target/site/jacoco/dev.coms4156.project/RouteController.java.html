@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouteController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project</a> &gt; <span class="el_source">RouteController.java</span></div><h1>RouteController.java</h1><pre class="source lang-java linenums">package dev.coms4156.project;
+
+import dev.coms4156.project.command.AddEmpToDeptCmd;
+import dev.coms4156.project.command.Command;
+import dev.coms4156.project.command.GetDeptInfoCmd;
+import dev.coms4156.project.command.GetEmpInfoCmd;
+import dev.coms4156.project.command.GetOrgInfoCmd;
+import dev.coms4156.project.command.RegisterCmd;
+import dev.coms4156.project.command.RemoveEmpFromDeptCmd;
+import dev.coms4156.project.command.SetDeptHeadCmd;
+import dev.coms4156.project.command.SetEmpPerfCmd;
+import dev.coms4156.project.command.SetEmpPosiCmd;
+import dev.coms4156.project.command.SetEmpSalCmd;
+import dev.coms4156.project.command.StatDeptBudgCmd;
+import dev.coms4156.project.command.StatDeptPerfCmd;
+import dev.coms4156.project.command.StatDeptPosiCmd;
+import dev.coms4156.project.exception.NotFoundException;
+import dev.coms4156.project.utils.CodecUtils;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * This class contains all the API routes for the system.
+ */
+@RestController
+<span class="fc" id="L36">public class RouteController {</span>
+
+  /**
+   * Redirects to the homepage.
+   */
+  @GetMapping({&quot;/&quot;, &quot;/index&quot;, &quot;/home&quot;})
+  public String index() {
+<span class="nc" id="L43">    return &quot;Welcome, in order to make an API call direct your browser or Postman to an endpoint.&quot;;</span>
+  }
+
+  /* ***** GET METHODS ***** */
+
+  /**
+   * Gets the information of a department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @return the information of the department
+   */
+  @GetMapping(value = &quot;/getDeptInfo&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; getDepartment(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId
+  ) {
+<span class="fc" id="L60">    Command command = new GetDeptInfoCmd(clientId, departmentId);</span>
+<span class="fc" id="L61">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Gets the information of an employee.
+   *
+   * @param clientId the client ID
+   * @param employeeId the employee ID
+   * @return the information of the employee
+   */
+  @GetMapping(value = &quot;/getEmpInfo&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; getEmployee(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;eid&quot;) int employeeId
+  ) {
+<span class="fc" id="L76">    Command command = new GetEmpInfoCmd(clientId, employeeId);</span>
+<span class="fc" id="L77">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Gets the information of an organization.
+   *
+   * @param clientId the client ID
+   * @return the information of the organization
+   */
+  @GetMapping(value = &quot;/getOrgInfo&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; getOrganization(
+      @RequestAttribute(&quot;cid&quot;) int clientId
+  ) {
+<span class="fc" id="L90">    Command command = new GetOrgInfoCmd(clientId);</span>
+<span class="fc" id="L91">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Gets the budget statistics of a department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @return the statistics of the department
+   */
+  @GetMapping(value = &quot;/statDeptBudget&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; getDepartmentBudgetStatistic(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId
+  ) {
+<span class="fc" id="L106">    Command command = new StatDeptBudgCmd(clientId, departmentId);</span>
+<span class="fc" id="L107">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Gets the performance statistics of a department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @return the statistics of the department
+   */
+  @GetMapping(value = &quot;/statDeptPerf&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; getDepartmentPerformanceStatistic(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId
+  ) {
+<span class="fc" id="L122">    Command command = new StatDeptPerfCmd(clientId, departmentId);</span>
+<span class="fc" id="L123">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Gets the position statistics of a department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @return the statistics of the department
+   */
+  @GetMapping(value = &quot;/statDeptPos&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; getDepartmentPositionStatistic(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId
+  ) {
+<span class="fc" id="L138">    Command command = new StatDeptPosiCmd(clientId, departmentId);</span>
+<span class="fc" id="L139">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /* ***** PATCH METHODS ***** */
+
+  /**
+   * Sets the head of a department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @param employeeId the employee ID
+   * @return true if the head is set, false otherwise
+   */
+  @PatchMapping(value = &quot;/setDeptHead&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; setDepartmentHead(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId,
+      @RequestParam(&quot;eid&quot;) int employeeId
+  ) {
+<span class="fc" id="L158">    Command command = new SetDeptHeadCmd(clientId, departmentId, employeeId);</span>
+<span class="fc" id="L159">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Set the performance of an employee.
+   *
+   * @param clientId the client ID
+   * @param employeeId the employee ID
+   * @param performance the performance value to set
+   */
+  @PatchMapping(value = &quot;/setEmpPerf&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; setEmployeePerformance(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;eid&quot;) int employeeId,
+      @RequestParam(&quot;performance&quot;) double performance
+  ) {
+<span class="fc" id="L175">    Command command = new SetEmpPerfCmd(clientId, employeeId, performance);</span>
+<span class="fc" id="L176">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Set the position of an employee.
+   *
+   * @param clientId the client ID
+   * @param employeeId the employee ID
+   * @param position the position to set
+   */
+  @PatchMapping(value = &quot;/setEmpPos&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; setEmployeePosition(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;eid&quot;) int employeeId,
+      @RequestParam(&quot;position&quot;) String position
+  ) {
+<span class="fc" id="L192">    Command command = new SetEmpPosiCmd(clientId, employeeId, position);</span>
+<span class="fc" id="L193">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Set the salary of an employee.
+   *
+   * @param clientId the client ID
+   * @param employeeId the employee ID
+   * @param salary the salary to set
+   */
+  @PatchMapping(value = &quot;/setEmpSalary&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; setEmployeeSalary(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;eid&quot;) int employeeId,
+      @RequestParam(&quot;salary&quot;) double salary
+  ) {
+<span class="fc" id="L209">    Command command = new SetEmpSalCmd(clientId, employeeId, salary);</span>
+<span class="fc" id="L210">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Update all the information of an employee.
+   * The provided information will overwrite the existing information, if not null.
+   * If the information is null, the existing information will be retained.
+   * Notice: No associated command for this method.
+   *
+   * @param clientId the client ID
+   * @param employeeId the employee ID
+   * @param position (optional) the position to set
+   * @param salary (optional) the salary to set
+   * @param performance (optional) the performance to set
+   * @return a success message if the employee is successfully updated.
+   */
+  @PatchMapping(value = &quot;/updateEmpInfo&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; updateEmployeeInfo(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;eid&quot;) int employeeId,
+      @RequestParam(value = &quot;position&quot;, required = false) String position,
+      @RequestParam(value = &quot;salary&quot;, required = false) Double salary,
+      @RequestParam(value = &quot;performance&quot;, required = false) Double performance
+  ) {
+<span class="fc" id="L234">    String component = &quot; &quot;;</span>
+<span class="fc" id="L235">    Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+    try {
+<span class="fc bfc" id="L237" title="All 2 branches covered.">      if (position != null) {</span>
+<span class="fc" id="L238">        Command command = new SetEmpPosiCmd(clientId, employeeId, position);</span>
+<span class="fc" id="L239">        command.execute();</span>
+<span class="fc" id="L240">        component += &quot;position &quot;;</span>
+      }
+<span class="fc bfc" id="L242" title="All 2 branches covered.">      if (salary != null) {</span>
+<span class="fc" id="L243">        Command command = new SetEmpSalCmd(clientId, employeeId, salary);</span>
+<span class="fc" id="L244">        command.execute();</span>
+<span class="fc" id="L245">        component += &quot;salary &quot;;</span>
+      }
+<span class="fc bfc" id="L247" title="All 2 branches covered.">      if (performance != null) {</span>
+<span class="fc" id="L248">        Command command = new SetEmpPerfCmd(clientId, employeeId, performance);</span>
+<span class="fc" id="L249">        command.execute();</span>
+<span class="fc" id="L250">        component += &quot;performance &quot;;</span>
+      }
+<span class="fc" id="L252">      response.put(&quot;status&quot;, 200);</span>
+<span class="fc" id="L253">      response.put(&quot;message&quot;, &quot;Employee&quot; + component + &quot;information updated successfully&quot;);</span>
+<span class="fc" id="L254">      return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="nc" id="L255">    } catch (Exception e) {</span>
+<span class="nc" id="L256">      response.put(&quot;status&quot;, 500);</span>
+<span class="nc" id="L257">      response.put(&quot;message&quot;, &quot;Failed to update employee information: &quot; + e.getMessage());</span>
+<span class="nc" id="L258">      return new ResponseEntity&lt;&gt;(response, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+    }
+  }
+
+  /* ***** POST METHODS ***** */
+
+  /**
+   * Add an employee to the given department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @param name the employee name
+   * @param hireDate the hire date of the employee
+   * @param position the position of the employee
+   * @param salary the salary of the employee
+   * @param performance the performance of the employee
+   * @return a success message if the employee is successfully added,
+   *         or throws an exception if the operation fails
+   */
+  @PostMapping(value = &quot;/addEmpToDept&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; addEmployeeToDepartment(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId,
+      @RequestParam(&quot;name&quot;) String name,
+      @RequestParam(&quot;hireDate&quot;) String hireDate, // this need to be in format of &quot;yyyy-MM-dd&quot;
+      @RequestParam(value = &quot;position&quot;, required = false, defaultValue = &quot;&quot;) String position,
+      @RequestParam(value = &quot;salary&quot;, required = false, defaultValue = &quot;0&quot;) Double salary,
+      @RequestParam(value = &quot;performance&quot;, required = false, defaultValue = &quot;0&quot;) Double performance
+  ) {
+<span class="fc" id="L287">    Command command = new AddEmpToDeptCmd(</span>
+<span class="fc" id="L288">        clientId, departmentId, name, hireDate, position, salary, performance</span>
+    );
+<span class="fc" id="L290">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.CREATED);</span>
+  }
+
+  /**
+   * Login as a client by validating the client ID.
+   * Notice: No associated command for this method.
+   *
+   * @param clientId the client ID
+   * @return a success message if the client ID is valid,
+   *        or throws a 401 exception if the operation fails
+   */
+  @PostMapping(value = &quot;/login&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; login(
+      @RequestParam(&quot;cid&quot;) String clientId
+  ) {
+<span class="fc" id="L305">    Map&lt;String, String&gt; response = new HashMap&lt;&gt;();</span>
+    try {
+<span class="fc" id="L307">      int cid = Integer.parseInt(CodecUtils.decode(clientId));</span>
+<span class="fc" id="L308">      Command command = new GetOrgInfoCmd(cid);</span>
+<span class="fc" id="L309">      Map&lt;String, Object&gt; orgResponse = (Map&lt;String, Object&gt;) command.execute();</span>
+<span class="fc" id="L310">      String orgName = (String) orgResponse.get(&quot;name&quot;);</span>
+<span class="fc" id="L311">      response.put(&quot;status&quot;, &quot;success&quot;);</span>
+<span class="fc" id="L312">      response.put(&quot;message&quot;, &quot;Logged in as &quot; + orgName);</span>
+<span class="fc" id="L313">      return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="fc" id="L314">    } catch (NotFoundException | IllegalArgumentException e) {</span>
+<span class="fc" id="L315">      response.put(&quot;status&quot;, &quot;failed&quot;);</span>
+<span class="fc" id="L316">      response.put(&quot;message&quot;, &quot;Invalid client ID&quot;);</span>
+<span class="fc" id="L317">      return new ResponseEntity&lt;&gt;(response, HttpStatus.UNAUTHORIZED);</span>
+    }
+  }
+
+  /**
+   * Register a new client, namely to create a new organization.
+   *
+   * @param name the name of the organization
+   * @return a success message and client ID if the organization is successfully created,
+   *        or a failure message if the operation fails.
+   */
+  @PostMapping(value = &quot;/register&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; register(
+      @RequestParam(&quot;name&quot;) String name
+  ) {
+<span class="fc" id="L332">    Command command = new RegisterCmd(name);</span>
+<span class="fc" id="L333">    Map&lt;String, String&gt; response = (Map&lt;String, String&gt;) command.execute();</span>
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">    if (response.get(&quot;status&quot;).equals(&quot;success&quot;)) {</span>
+<span class="fc" id="L335">      return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</span>
+    } else {
+<span class="nc" id="L337">      return new ResponseEntity&lt;&gt;(response, HttpStatus.BAD_REQUEST);</span>
+    }
+  }
+
+  /* ***** DELETE METHODS ***** */
+
+  /**
+   * Remove an employee from the given department.
+   *
+   * @param clientId the client ID
+   * @param departmentId the department ID
+   * @param employeeId the employee ID
+   * @return a success message if the employee is successfully removed,
+   *         or throws an exception if the operation fails
+   */
+  @DeleteMapping(value = &quot;/removeEmpFromDept&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; removeEmployeeFromDept(
+      @RequestAttribute(&quot;cid&quot;) int clientId,
+      @RequestParam(&quot;did&quot;) int departmentId,
+      @RequestParam(&quot;eid&quot;) int employeeId
+  ) {
+<span class="fc" id="L358">    Command command = new RemoveEmpFromDeptCmd(clientId, departmentId, employeeId);</span>
+<span class="fc" id="L359">    return new ResponseEntity&lt;&gt;(command.execute(), HttpStatus.OK);</span>
+  }
+
+  /**
+   * Handles any exceptions that occur in controller.
+   *
+   * @param e the exception that occurred
+   * @return the response entity
+   * @deprecated This method is replaced by the global exception handler after 80586a8
+   */
+  @Deprecated
+  private ResponseEntity&lt;?&gt; handleException(Exception e) {
+<span class="nc" id="L371">    System.out.println(e.toString());</span>
+<span class="nc" id="L372">    return new ResponseEntity&lt;&gt;(&quot;An Error has occurred&quot;, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
