@@ -1,19 +1,15 @@
 package dev.coms4156.project;
 
-import dev.coms4156.project.command.Command;
-import dev.coms4156.project.command.GetOrgInfoCmd;
-import dev.coms4156.project.command.RegisterCmd;
+import dev.coms4156.project.command.*;
 import dev.coms4156.project.exception.NotFoundException;
 import dev.coms4156.project.utils.CodecUtils;
+import java.time.DayOfWeek;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This class contains all the API routes for the system.
@@ -73,6 +69,105 @@ public class RouteController {
     if (response.get("status").equals("success")) {
       return new ResponseEntity<>(response, HttpStatus.CREATED);
     } else {
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Adds a recurring shift assignment for an employee.
+   *
+   * @param clientId the encoded client ID
+   * @param employeeId the employee ID
+   * @param dayOfWeek the day of week (1-7, Monday to Sunday)
+   * @param timeSlot the time slot (0: 9-12, 1: 14-17, 2: 18-21)
+   * @return a success message if the shift is assigned, or an error message if the operation fails
+   */
+  @PostMapping(value = "/addShift", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> addShift(
+          @RequestParam("cid") String clientId,
+          @RequestParam("employeeId") int employeeId,
+          @RequestParam("dayOfWeek") int dayOfWeek,
+          @RequestParam("timeSlot") int timeSlot
+  ) {
+    try {
+      int cid = Integer.parseInt(CodecUtils.decode(clientId));
+      Command command = new AddShiftCmd(cid, employeeId,
+              DayOfWeek.of(dayOfWeek), TimeSlot.fromValue(timeSlot));
+      Map<String, Object> response = (Map<String, Object>) command.execute();
+
+      if (response.get("status").equals("success")) {
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+      } else {
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      }
+    } catch (NotFoundException | IllegalArgumentException e) {
+      Map<String, String> response = new HashMap<>();
+      response.put("status", "failed");
+      response.put("message", e.getMessage());
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Gets shift assignments, optionally filtered by day or employee.
+   *
+   * @param clientId the encoded client ID
+   * @param dayOfWeek optional: the day of week to filter by (1-7, Monday to Sunday)
+   * @param employeeId optional: the employee ID to filter by
+   * @return a list of shift assignments
+   */
+  @GetMapping(value = "/getShift", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getShift(
+          @RequestParam("cid") String clientId,
+          @RequestParam(value = "dayOfWeek", required = false) Integer dayOfWeek,
+          @RequestParam(value = "employeeId", required = false) Integer employeeId
+  ) {
+    try {
+      int cid = Integer.parseInt(CodecUtils.decode(clientId));
+      DayOfWeek day = dayOfWeek != null ? DayOfWeek.of(dayOfWeek) : null;
+
+      Command command = new GetShiftCmd(cid, day, employeeId);
+      Map<String, Object> response = (Map<String, Object>) command.execute();
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (NotFoundException | IllegalArgumentException e) {
+      Map<String, String> response = new HashMap<>();
+      response.put("status", "failed");
+      response.put("message", e.getMessage());
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Removes a shift assignment.
+   *
+   * @param clientId the encoded client ID
+   * @param employeeId the employee ID
+   * @param dayOfWeek the day of week (1-7, Monday to Sunday)
+   * @param timeSlot the time slot (0: 9-12, 1: 14-17, 2: 18-21)
+   * @return a success message if the shift is removed, or an error message if the operation fails
+   */
+  @DeleteMapping(value = "/removeShift", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> removeShift(
+          @RequestParam("cid") String clientId,
+          @RequestParam("employeeId") int employeeId,
+          @RequestParam("dayOfWeek") int dayOfWeek,
+          @RequestParam("timeSlot") int timeSlot
+  ) {
+    try {
+      int cid = Integer.parseInt(CodecUtils.decode(clientId));
+      Command command = new RemoveShiftCmd(cid, employeeId,
+              DayOfWeek.of(dayOfWeek), TimeSlot.fromValue(timeSlot));
+      Map<String, Object> response = (Map<String, Object>) command.execute();
+
+      if (response.get("status").equals("success")) {
+        return new ResponseEntity<>(response, HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      }
+    } catch (NotFoundException | IllegalArgumentException e) {
+      Map<String, String> response = new HashMap<>();
+      response.put("status", "failed");
+      response.put("message", e.getMessage());
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
   }

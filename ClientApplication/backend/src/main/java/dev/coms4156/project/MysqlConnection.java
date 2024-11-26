@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.DayOfWeek;
 
 /**
  * A singleton class of database connection.
@@ -600,5 +601,88 @@ public class MysqlConnection implements DatabaseConnection {
       }
     }
     return instance;
+  }
+  @Override
+  public boolean assignShift(int organizationId, int employeeId, DayOfWeek dayOfWeek, TimeSlot timeSlot) {
+    int internalEmployeeId = organizationId * 10000 + employeeId;
+    String query = "INSERT INTO shifts (organization_id, employee_id, day_of_week, time_slot) "
+            + "VALUES (?, ?, ?, ?)";
+
+    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+      pstmt.setInt(1, organizationId);
+      pstmt.setInt(2, internalEmployeeId);
+      pstmt.setInt(3, dayOfWeek.getValue());  // DayOfWeek.getValue() returns 1 (Monday) through 7 (Sunday)
+      pstmt.setInt(4, timeSlot.getValue());   // TimeSlot.getValue() returns 0, 1, or 2
+
+      int rowsAffected = pstmt.executeUpdate();
+      return rowsAffected > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  @Override
+  public List<ShiftAssignment> getShifts(int organizationId, DayOfWeek dayOfWeek, Integer employeeId) {
+    List<ShiftAssignment> shifts = new ArrayList<>();
+    StringBuilder query = new StringBuilder(
+            "SELECT s.*, e.name as employee_name "
+                    + "FROM shifts s "
+                    + "JOIN employees e ON s.employee_id = e.employee_id "
+                    + "WHERE s.organization_id = ?"
+    );
+
+    if (dayOfWeek != null) {
+      query.append(" AND s.day_of_week = ?");
+    }
+    if (employeeId != null) {
+      query.append(" AND s.employee_id = ?");
+    }
+
+    try (PreparedStatement pstmt = connection.prepareStatement(query.toString())) {
+      int paramIndex = 1;
+      pstmt.setInt(paramIndex++, organizationId);
+
+      if (dayOfWeek != null) {
+        pstmt.setInt(paramIndex++, dayOfWeek.getValue());
+      }
+      if (employeeId != null) {
+        pstmt.setInt(paramIndex, organizationId * 10000 + employeeId);
+      }
+
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        ShiftAssignment shift = new ShiftAssignment(
+                rs.getInt("employee_id") % 10000,
+                rs.getString("employee_name"),
+                DayOfWeek.of(rs.getInt("day_of_week")),
+                TimeSlot.fromValue(rs.getInt("time_slot"))
+        );
+        shifts.add(shift);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return shifts;
+  }
+
+  @Override
+  public boolean removeShift(int organizationId, int employeeId, DayOfWeek dayOfWeek, TimeSlot timeSlot) {
+    int internalEmployeeId = organizationId * 10000 + employeeId;
+    String query = "DELETE FROM shifts "
+            + "WHERE organization_id = ? AND employee_id = ? AND day_of_week = ? AND time_slot = ?";
+
+    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+      pstmt.setInt(1, organizationId);
+      pstmt.setInt(2, internalEmployeeId);
+      pstmt.setInt(3, dayOfWeek.getValue());
+      pstmt.setInt(4, timeSlot.getValue());
+
+      int rowsAffected = pstmt.executeUpdate();
+      return rowsAffected > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
   }
 }

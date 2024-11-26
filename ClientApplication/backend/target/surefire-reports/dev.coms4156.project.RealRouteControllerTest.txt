@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: dev.coms4156.project.RealRouteControllerTest
--------------------------------------------------------------------------------
-Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.602 s -- in dev.coms4156.project.RealRouteControllerTest
