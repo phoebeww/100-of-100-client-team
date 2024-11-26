@@ -1,27 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import ApiService from "../../services/api.ts";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const RegisterPage: React.FC = () => {
-    const [clientName, setClientName] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [departmentId, setDepartmentId] = useState('');
+    const [departments, setDepartments] = useState<{ id: number; name: string }[]>([]);
+    const [hireDate, setHireDate] = useState('');
+    const [position, setPosition] = useState('');
     const [message, setMessage] = useState('');
-    const [showLoginLink, setShowLoginLink] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Fetch departments
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            const clientId = localStorage.getItem('clientId');
+            if (!clientId) {
+                setError('No client ID found');
+                return;
+            }
+
+            try {
+                const response = await ApiService.getOrgInfo(clientId);
+                if (response.status === 200) {
+                    setDepartments(response.data.departments);
+                } else {
+                    setError('Failed to fetch departments');
+                }
+            } catch (err) {
+                console.error('Error fetching departments:', err);
+                setError('Error connecting to server');
+            }
+        };
+
+        fetchDepartments();
+    }, []);
 
     const handleRegister = async () => {
-        if (!clientName.trim()) {
-            setMessage('Please enter your organization name');
+        if (!firstName.trim() || !lastName.trim() || !departmentId || !hireDate.trim() || !position.trim()) {
+            setMessage('Please fill in all fields.');
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await ApiService.registerOrganization(clientName);
+            const response = await ApiService.registerEmployee(firstName, lastName, parseInt(departmentId, 10), hireDate, position);
             if (response.status === 201 && response.data.status === 'success') {
-                const clientId = response.data.token;
-                setMessage(`Registration successful! Your unique ID is: ${clientId}`);
-                setShowLoginLink(true);
+                setMessage('Registration successful! You are now registered.');
             } else {
                 setMessage(`Registration failed: ${response.data.message || 'Unknown error'}`);
             }
@@ -34,63 +62,89 @@ const RegisterPage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            <div className="w-full max-w-md space-y-6">
-                <div className="space-y-2 text-center">
-                    <h1 className="text-3xl font-bold">Register Organization</h1>
-                    <p className="text-gray-500">Create an account for your organization</p>
-                </div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="w-full max-w-md space-y-6">
+              <div className="space-y-2 text-center">
+                  <h1 className="text-3xl font-bold">Register Employee</h1>
+                  <p className="text-gray-500">Add as a new employee to your organization</p>
+              </div>
 
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <input
-                            type="text"
-                            placeholder="Enter Organization Name"
-                            value={clientName}
-                            onChange={(e) => setClientName(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onKeyPress={(e) => e.key === 'Enter' && handleRegister()}
-                        />
-                    </div>
+              <div className="space-y-4">
+                  <div className="space-y-2">
+                      <input
+                        type="text"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                  </div>
+                  <div className="space-y-2">
+                      <input
+                        type="text"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                  </div>
+                  <div className="space-y-2">
+                      <select
+                        value={departmentId}
+                        onChange={(e) => setDepartmentId(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                          <option value="">Select Department</option>
+                          {departments.map((dept) => (
+                            <option key={dept.id} value={dept.id}>
+                                {dept.name}
+                            </option>
+                          ))}
+                      </select>
+                  </div>
+                  <div className="space-y-2">
+                      <input
+                        type="date"
+                        value={hireDate}
+                        onChange={(e) => setHireDate(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                  </div>
+                  <div className="space-y-2">
+                      <input
+                        type="text"
+                        placeholder="Position"
+                        value={position}
+                        onChange={(e) => setPosition(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                  </div>
 
-                    <button 
-                        onClick={handleRegister}
-                        disabled={isLoading}
-                        className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? 'Registering...' : 'Register'}
-                    </button>
+                  <button
+                    onClick={handleRegister}
+                    disabled={isLoading}
+                    className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                      {isLoading ? 'Registering...' : 'Register'}
+                  </button>
 
-                    {message && (
-                        <Alert variant={message.includes('successful') ? 'default' : 'destructive'}>
-                            <AlertDescription>{message}</AlertDescription>
-                        </Alert>
-                    )}
+                  {message && (
+                    <Alert variant={message.includes('successful') ? 'default' : 'destructive'}>
+                        <AlertDescription>{message}</AlertDescription>
+                    </Alert>
+                  )}
 
-                    {showLoginLink && (
-                        <div className="text-center">
-                            <p className="text-sm text-gray-500">
-                                Registration complete! Please{' '}
-                                <Link to="/ClientApplication/front-end/publicend/public" className="text-blue-600 hover:underline">
-                                    login with your unique ID
-                                </Link>
-                            </p>
-                        </div>
-                    )}
-
-                    {!showLoginLink && (
-                        <div className="text-center">
-                            <p className="text-sm text-gray-500">
-                                Already have an account?{' '}
-                                <Link to="/ClientApplication/front-end/publicend/public" className="text-blue-600 hover:underline">
-                                    Login here
-                                </Link>
-                            </p>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+                  <div className="text-center">
+                      <p className="text-sm text-gray-500">
+                          Want to go back?{' '}
+                          <Link to="/" className="text-blue-600 hover:underline">
+                              Return to Home
+                          </Link>
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </div>
     );
 };
 

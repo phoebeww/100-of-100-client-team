@@ -42,12 +42,14 @@ class ApiService {
   }
 
   // Auth endpoints (using AUTH_BASE_URL)
-  static async login(clientId: string): Promise<ApiResponse<LoginResponse>> {
-    return this.request<LoginResponse>('/login', 'POST', AUTH_BASE_URL, {cid: clientId});
+  static async login(employeeId: string, name: string): Promise<ApiResponse<LoginResponse>> {
+    return this.request<LoginResponse>('/login', 'POST', AUTH_BASE_URL, {eid: employeeId, name: name});
   }
 
-  static async registerOrganization(name: string): Promise<ApiResponse<RegisterResponse>> {
-    return this.request<RegisterResponse>('/register', 'POST', AUTH_BASE_URL, {name});
+  static async registerEmployee(firstName: string, lastName: string, departmentId: number, hireDate: string,
+                                position: string): Promise<ApiResponse<RegisterResponse>> {
+    return this.request<RegisterResponse>(
+      '/register', 'POST', AUTH_BASE_URL, {firstName, lastName, departmentId, hireDate, position});
   }
 
   // Organization endpoints (using API_BASE_URL)

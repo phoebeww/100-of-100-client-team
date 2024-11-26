@@ -9,25 +9,29 @@ interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
-    const [uniqueId, setUniqueId] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [employeeId, setEmployeeId] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
-        if (!uniqueId.trim()) {
-            setMessage('Please enter your unique ID');
+        if (!firstName.trim() || !lastName.trim() || !employeeId.trim()) {
+            setMessage('Please fill in all fields');
             return;
         }
 
         setIsLoading(true);
         try {
-            const response: ApiResponse<LoginResponse> = await ApiService.login(uniqueId);
+            const fullName = `${firstName.trim()} ${lastName.trim()}`; // Format name as "firstname%20lastname"
+            const response: ApiResponse<LoginResponse> = await ApiService.login(employeeId, fullName);
+
             if (response.status === 200 && response.data.status === 'success') {
                 setIsAuthenticated(true);
-                localStorage.setItem('clientId', uniqueId);
+                localStorage.setItem('employeeId', employeeId);
                 setMessage(response.data.message);
             } else {
-                setMessage('Login failed. Please check your ID and try again.');
+                setMessage('Login failed. Please check your details and try again.');
             }
         } catch (error) {
             console.error(error);
@@ -38,50 +42,64 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            <div className="w-full max-w-md space-y-6">
-                <div className="space-y-2 text-center">
-                    <h1 className="text-3xl font-bold">Welcome Back</h1>
-                    <p className="text-gray-500">Enter your organization's unique ID to continue</p>
-                </div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="w-full max-w-md space-y-6">
+              <div className="space-y-2 text-center">
+                  <h1 className="text-3xl font-bold">Employee Login</h1>
+                  <p className="text-gray-500">Enter your details to continue</p>
+              </div>
 
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <input
-                            type="text"
-                            placeholder="Enter your unique ID"
-                            value={uniqueId}
-                            onChange={(e) => setUniqueId(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                        />
-                    </div>
+              <div className="space-y-4">
+                  <div className="space-y-2">
+                      <input
+                        type="text"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Employee ID"
+                        value={employeeId}
+                        onChange={(e) => setEmployeeId(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                      />
+                  </div>
 
-                    <button 
-                        onClick={handleLogin}
-                        disabled={isLoading}
-                        className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? 'Logging in...' : 'Login'}
-                    </button>
+                  <button
+                    onClick={handleLogin}
+                    disabled={isLoading}
+                    className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                      {isLoading ? 'Logging in...' : 'Login'}
+                  </button>
 
-                    {message && (
-                        <Alert variant={message.includes('successful') ? 'default' : 'destructive'}>
-                            <AlertDescription>{message}</AlertDescription>
-                        </Alert>
-                    )}
+                  {message && (
+                    <Alert variant={message.includes('successful') ? 'default' : 'destructive'}>
+                        <AlertDescription>{message}</AlertDescription>
+                    </Alert>
+                  )}
 
-                    <div className="text-center space-y-2">
-                        <p className="text-sm text-gray-500">
-                            Don't have a unique ID?{' '}
-                            <Link to="/register" className="text-blue-600 hover:underline">
-                                Register your organization
-                            </Link>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+                  <div className="text-center space-y-2">
+                      <p className="text-sm text-gray-500">
+                          New Employee?{' '}
+                          <Link to="/register" className="text-blue-600 hover:underline">
+                              Register here
+                          </Link>
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </div>
     );
 };
 

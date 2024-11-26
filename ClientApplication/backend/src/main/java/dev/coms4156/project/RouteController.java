@@ -1,11 +1,13 @@
 package dev.coms4156.project;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.coms4156.project.command.*;
 import dev.coms4156.project.exception.NotFoundException;
 import dev.coms4156.project.utils.CodecUtils;
 import java.time.DayOfWeek;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class RouteController {
 
+  @Autowired
+  private MyServiceCaller serviceCaller;
+
   /**
    * Redirects to the homepage.
    */
@@ -26,50 +31,104 @@ public class RouteController {
   }
 
   /**
-   * Login as a client by validating the client ID.
-   * Notice: No associated command for this method.
+   * Login by validating employee ID and name.
    *
-   * @param clientId the client ID
-   * @return a success message if the client ID is valid,
-   *        or throws a 401 exception if the operation fails
+   * @param employeeId the employee ID
+   * @param name the employee name
+   * @return a success message if the credentials are valid, or an error message if invalid
    */
   @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> login(
-      @RequestParam("cid") String clientId
+    @RequestParam("eid") String employeeId,
+    @RequestParam("name") String name
   ) {
     Map<String, String> response = new HashMap<>();
     try {
-      int cid = Integer.parseInt(CodecUtils.decode(clientId));
-      Command command = new GetOrgInfoCmd(cid);
-      Map<String, Object> orgResponse = (Map<String, Object>) command.execute();
-      String orgName = (String) orgResponse.get("name");
+      // Call the service to get employee info
+      String employeeInfo = serviceCaller.getEmployeeInfo(employeeId);
+
+      if (employeeInfo == null || employeeInfo.isEmpty()) {
+        response.put("status", "failed");
+        response.put("message", "Employee ID does not exist");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+      }
+
+      // Parse the response to get the employee name (assuming JSON response)
+      ObjectMapper objectMapper = new ObjectMapper();
+      Map<String, Object> employeeData = objectMapper.readValue(employeeInfo, Map.class);
+      String fetchedName = (String) employeeData.get("name");
+      System.out.println(employeeData);
+      System.out.println(name);
+      System.out.println(fetchedName);
+
+      // Validate the name
+      if (!name.equals(fetchedName)) {
+        response.put("status", "failed");
+        response.put("message", "Employee name does not match");
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+      }
+
+      // Login successful
       response.put("status", "success");
-      response.put("message", "Logged in as " + orgName);
+      response.put("message", "Logged in as " + fetchedName);
       return new ResponseEntity<>(response, HttpStatus.OK);
-    } catch (NotFoundException | IllegalArgumentException e) {
+
+    } catch (Exception e) {
+      e.printStackTrace();
       response.put("status", "failed");
-      response.put("message", "Invalid client ID");
-      return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+      response.put("message", "An error occurred while logging in");
+      return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   /**
-   * Register a new client, namely to create a new organization.
+   * Registers a new employee within the specified organization.
+   * This function allows for adding a new employee with details such as
+   * full name, hire date, position, and department ID to an existing organization.
    *
-   * @param name the name of the organization
-   * @return a success message and client ID if the organization is successfully created,
-   *        or a failure message if the operation fails.
+   * @param firstName the first name of the employee
+   * @param lastName the last name of the employee
+   * @param departmentId the ID of the department where the employee will be added
+   * @param hireDate the hire date of the employee in "yyyy-MM-dd" format
+   * @param position the position or role of the employee within the department
+   * @return a success message along with the employee ID if the registration is successful,
+   *         or an error message if the operation fails
    */
-  @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> register(
-      @RequestParam("name") String name
+  @PostMapping("/register")
+  public ResponseEntity<?> registerEmployee(
+    @RequestParam("firstName") String firstName,
+    @RequestParam("lastName") String lastName,
+    @RequestParam("departmentId") int departmentId,
+    @RequestParam("hireDate") String hireDate,
+    @RequestParam("position") String position
   ) {
-    Command command = new RegisterCmd(name);
-    Map<String, String> response = (Map<String, String>) command.execute();
-    if (response.get("status").equals("success")) {
+    Map<String, Object> response = new HashMap<>();
+
+    try {
+      // Combine first and last name
+      String fullName = firstName + " " + lastName;
+
+      // Call service to add a new employee
+      String addEmployeeResponse = serviceCaller.registerNewEmployee(fullName, departmentId, hireDate, position);
+      ObjectMapper objectMapper = new ObjectMapper();
+      Map<String, Object> employeeData = objectMapper.readValue(addEmployeeResponse, Map.class);
+      System.out.println(employeeData);
+
+      if ((int) employeeData.get("status") != 200) {
+        response.put("status", "failed");
+        response.put("message", "Failed to register new employee");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      }
+
+      response.put("status", "success");
+      response.put("message", "Employee registered successfully");
+
       return new ResponseEntity<>(response, HttpStatus.CREATED);
-    } else {
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    } catch (Exception e) {
+      e.printStackTrace();
+      response.put("status", "failed");
+      response.put("message", "An error occurred while registering the employee");
+      return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
