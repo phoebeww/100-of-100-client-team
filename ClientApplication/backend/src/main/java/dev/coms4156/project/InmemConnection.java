@@ -1,5 +1,6 @@
 package dev.coms4156.project;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -314,6 +315,22 @@ public class InmemConnection implements DatabaseConnection {
     testOrganizations.put(newId, newOrganization);
     return newOrganization;
   }
+
+  @Override
+  public boolean assignShift(int organizationId, int employeeId, DayOfWeek dayOfWeek, TimeSlot timeSlot){
+    return false;
+  }
+
+  @Override
+  public boolean removeShift(int organizationId, int employeeId, DayOfWeek dayOfWeek, TimeSlot timeSlot){
+      return false;
+  }
+
+  @Override
+  public List<ShiftAssignment> getShifts(int organizationId, DayOfWeek dayOfWeek, Integer employeeId){
+      return null;
+  }
+
 
   /** Initializes the test data for the stub. */
   private void initializeTestData() {
