@@ -393,24 +393,18 @@ public class RouteController {
   }
 
   /**
-   * Gets shift assignments, optionally filtered by day or employee.
+   * Gets shift assignments of an organization.
    *
    * @param clientId the encoded client ID
-   * @param dayOfWeek optional: the day of week to filter by (1-7, Monday to Sunday)
-   * @param employeeId optional: the employee ID to filter by
    * @return a list of shift assignments
    */
   @GetMapping(value = "/getShift", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getShift(
-          @RequestParam("cid") String clientId,
-          @RequestParam(value = "dayOfWeek", required = false) Integer dayOfWeek,
-          @RequestParam(value = "employeeId", required = false) Integer employeeId
+          @RequestParam("cid") String clientId
   ) {
     try {
       int cid = Integer.parseInt(CodecUtils.decode(clientId));
-      DayOfWeek day = dayOfWeek != null ? DayOfWeek.of(dayOfWeek) : null;
-
-      Command command = new GetShiftCmd(cid, day, employeeId);
+      Command command = new GetShiftCmd(cid);
       Map<String, Object> response = (Map<String, Object>) command.execute();
       return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (NotFoundException | IllegalArgumentException e) {

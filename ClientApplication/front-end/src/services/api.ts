@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://localhost:8080';
-const AUTH_BASE_URL = 'http://localhost:8081';
+const SERVICE_API_BASE_URL = 'http://localhost:8080';
+const CLIENT_SERVICE_API_BASE_URL = 'http://localhost:8081';
 
 import {
   ApiResponse,
@@ -11,7 +11,10 @@ import {
   DepartmentPerfStats,
   DepartmentPosStats,
   BasicResponse,
-  EmployeeInfo
+  EmployeeInfo,
+  ShiftResponse,
+  AddShiftResponse,
+  RemoveShiftResponse
 } from '../types/apiResponses.ts';
 
 class ApiService {
@@ -32,8 +35,7 @@ class ApiService {
       method,
       headers: {
         'Content-Type': 'application/json',
-      },
-      ...(method !== 'GET' && params ? {body: JSON.stringify(params)} : {})
+      }
     });
 
     console.log('Response Status:', response.status);
@@ -42,43 +44,43 @@ class ApiService {
     return {data, status: response.status};
   }
 
-  // Auth endpoints (using AUTH_BASE_URL)
+  // Auth endpoints (using CLIENT_SERVICE_API_BASE_URL)
   static async login(employeeId: string, name: string): Promise<ApiResponse<LoginResponse>> {
-    return this.request<LoginResponse>('/login', 'POST', AUTH_BASE_URL, {eid: employeeId, name: name});
+    return this.request<LoginResponse>('/login', 'POST', CLIENT_SERVICE_API_BASE_URL, {eid: employeeId, name: name});
   }
 
   static async registerEmployee(firstName: string, lastName: string, departmentId: number, hireDate: string,
                                 position: string): Promise<ApiResponse<RegisterResponse>> {
     return this.request<RegisterResponse>(
-      '/register', 'POST', AUTH_BASE_URL, {firstName, lastName, departmentId, hireDate, position});
+      '/register', 'POST', CLIENT_SERVICE_API_BASE_URL, {firstName, lastName, departmentId, hireDate, position});
   }
 
-  // Organization endpoints
+  // Organization endpoints (using SERVICE_API_BASE_URL)
   static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
-    return this.request<Organization>('/getOrgInfo', 'GET', AUTH_BASE_URL, {cid: clientId});
+    return this.request<Organization>('/getOrgInfo', 'GET', CLIENT_SERVICE_API_BASE_URL, {cid: clientId});
   }
 
-  // Department endpoints
+  // Department endpoints (using SERVICE_API_BASE_URL)
   static async getDepartmentInfo(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentInfo>> {
-    return this.request<DepartmentInfo>('/getDeptInfo', 'GET', AUTH_BASE_URL, {cid: clientId, did: departmentId});
+    return this.request<DepartmentInfo>('/getDeptInfo', 'GET', SERVICE_API_BASE_URL, {cid: clientId, did: departmentId});
   }
 
   static async getDepartmentBudgetStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentBudgetStats>> {
-    return this.request<DepartmentBudgetStats>('/statDeptBudget', 'GET', AUTH_BASE_URL, {
+    return this.request<DepartmentBudgetStats>('/statDeptBudget', 'GET', SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString()
     });
   }
 
   static async getDepartmentPerfStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentPerfStats>> {
-    return this.request<DepartmentPerfStats>('/statDeptPerf', 'GET', AUTH_BASE_URL, {
+    return this.request<DepartmentPerfStats>('/statDeptPerf', 'GET', SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString()
     });
   }
 
   static async getDepartmentPosStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentPosStats>> {
-    return this.request<DepartmentPosStats>('/statDeptPos', 'GET', AUTH_BASE_URL, {
+    return this.request<DepartmentPosStats>('/statDeptPos', 'GET', SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString()
     });
@@ -89,16 +91,16 @@ class ApiService {
     departmentId: number,
     employeeId: number
   ): Promise<ApiResponse<BasicResponse>> {
-    return this.request<BasicResponse>('/setDeptHead', 'PATCH', AUTH_BASE_URL, {
+    return this.request<BasicResponse>('/setDeptHead', 'PATCH', SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString(),
       eid: employeeId.toString()
     });
   }
 
-  // Employee Endpoints (using API_BASE_URL)
+  // Employee Endpoints (using SERVICE_API_BASE_URL)
   static async getEmployeeInfo(clientId: string, employeeId: number): Promise<ApiResponse<EmployeeInfo>> {
-    return this.request<EmployeeInfo>('/getEmpInfo', 'GET', AUTH_BASE_URL, {
+    return this.request<EmployeeInfo>('/getEmpInfo', 'GET', SERVICE_API_BASE_URL, {
       cid: clientId,
       eid: employeeId.toString()
     });
@@ -113,7 +115,7 @@ class ApiService {
     salary: number = 0,
     performance: number = 0
   ): Promise<ApiResponse<EmployeeInfo>> {
-    return this.request<EmployeeInfo>('/addEmpToDept', 'POST', AUTH_BASE_URL, {
+    return this.request<EmployeeInfo>('/addEmpToDept', 'POST', SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId,
       name,
@@ -133,7 +135,7 @@ class ApiService {
       performance?: number;
     }
   ): Promise<ApiResponse<string>> {
-    return this.request<string>('/updateEmpInfo', 'PATCH', AUTH_BASE_URL, {
+    return this.request<string>('/updateEmpInfo', 'PATCH', SERVICE_API_BASE_URL, {
       cid: clientId,
       eid: employeeId.toString(),
       ...updates,
@@ -145,12 +147,35 @@ class ApiService {
     departmentId: number,
     employeeId: number
   ): Promise<ApiResponse<BasicResponse>> {
-    return this.request<BasicResponse>('/removeEmpFromDept', 'DELETE', AUTH_BASE_URL, {
+    return this.request<BasicResponse>('/removeEmpFromDept', 'DELETE', SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString(),
       eid: employeeId.toString()
     });
   }
+
+  static async getShifts(clientId: string): Promise<ApiResponse<ShiftResponse>> {
+    return this.request('/getShift', 'GET', CLIENT_SERVICE_API_BASE_URL, { cid: clientId });
+  }
+
+  static async addShift(clientId: string, employeeId: number, dayOfWeek: number, timeSlot: number): Promise<ApiResponse<AddShiftResponse>> {
+    return this.request<AddShiftResponse>('/addShift', 'POST', CLIENT_SERVICE_API_BASE_URL, {
+      cid: clientId,
+      employeeId: employeeId,
+      dayOfWeek: dayOfWeek,
+      timeSlot: timeSlot
+    });
+  }
+
+  static async removeShift(clientId: string, employeeId: number, dayOfWeek: number, timeSlot: number): Promise<ApiResponse<RemoveShiftResponse>>{
+    return this.request('/removeShift', 'DELETE', CLIENT_SERVICE_API_BASE_URL, {
+      cid: clientId,
+      employeeId,
+      dayOfWeek,
+      timeSlot
+    });
+  }
+
 }
 
 export default ApiService;
