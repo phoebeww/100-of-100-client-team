@@ -92,3 +92,45 @@ export interface BasicResponse {
   status: string;
   message: string;
 }
+
+// shift management types
+
+export interface TimeSlotInfo {
+  timeSlot: string;
+  timeRange: string;
+}
+
+export interface ShiftInfo {
+  employeeId: number;
+  employeeName: string;
+  timeSlot: string;
+  timeRange: string;
+}
+
+export interface ShiftSchedule {
+  [key: string]: ShiftInfo[];
+}
+
+export interface ShiftResponse {
+  status: string;
+  schedule: ShiftSchedule;
+  availableSlots: {
+    [key: string]: TimeSlotInfo[];
+  };
+}
+
+export interface AddShiftResponse {
+  status: string;
+  message: string;
+  employeeName: string;
+  dayOfWeek: string;
+  timeSlot: string;
+}
+
+export interface RemoveShiftResponse {
+  status: string;
+  message: string;
+  employeeName: string;
+  dayOfWeek: string;
+  timeSlot: string;
+}

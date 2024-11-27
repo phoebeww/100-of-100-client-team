@@ -40,7 +40,11 @@ const RegisterPage: React.FC = () => {
     }, []);
 
     // find employeeId
-    const extractEmployeeId = (message) => {
+    interface ExtractEmployeeId {
+        (message: string): string | null;
+    }
+
+    const extractEmployeeId: ExtractEmployeeId = (message) => {
         const match = message.match(/Employee \[(\d+)]/); // Match "Employee [12345]"
         return match ? match[1] : null; // Return the ID or null if not found
     };
