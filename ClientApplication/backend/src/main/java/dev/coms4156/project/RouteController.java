@@ -139,11 +139,10 @@ public class RouteController {
    */
   @GetMapping(value = "/getOrgInfo", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getOrganization(
-    @RequestParam("cid") String clientId
   ) {
     try {
       // Call the service to retrieve organization info
-      String response = serviceCaller.getOrganizationInfo(clientId);
+      String response = serviceCaller.getOrganizationInfo();
       return ResponseEntity.ok(response);
     } catch (Exception e) {
       // Handle any errors and return an appropriate response
@@ -151,6 +150,209 @@ public class RouteController {
       errorResponse.put("status", "failed");
       errorResponse.put("message", e.getMessage());
       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Retrieves department information for the given client ID and department ID.
+   *
+   * @param departmentId the department ID
+   * @return the response from the service containing department information
+   */
+  @GetMapping(value = "/getDeptInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getDepartmentInfo(
+    @RequestParam("did") int departmentId) {
+    try {
+      // Call the service to retrieve department info
+      String response = serviceCaller.getDepartmentInfo(departmentId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      // Handle any errors and return an appropriate response
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Retrieves information for the given employee ID.
+   *
+   * @param employeeId the employee ID
+   * @return the information of the employee
+   */
+  @GetMapping(value = "/getEmpInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getEmployeeInfo(@RequestParam("eid") int employeeId) {
+    try {
+      String response = serviceCaller.getEmployeeInfo(employeeId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Retrieves budget statistics for the given department ID.
+   *
+   * @param departmentId the department ID
+   * @return the response from the service containing department budget statistics
+   */
+  @GetMapping(value = "/statDeptBudget", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getDepartmentBudgetStatistics(
+    @RequestParam("did") int departmentId) {
+    try {
+      // Call the service to retrieve budget statistics
+      String response = serviceCaller.getDepartmentBudgetStatistics(departmentId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      // Handle any errors and return an appropriate response
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Retrieves performance statistics for the given department ID.
+   *
+   * @param departmentId the department ID
+   * @return the performance statistics of the department
+   */
+  @GetMapping(value = "/statDeptPerf", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getDepartmentPerformanceStatistics(
+    @RequestParam("did") int departmentId) {
+    try {
+      String response = serviceCaller.getDepartmentPerformanceStatistics(departmentId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Retrieves position statistics for the given department ID.
+   *
+   * @param departmentId the department ID
+   * @return the position statistics of the department
+   */
+  @GetMapping(value = "/statDeptPos", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getDepartmentPositionStatistics(
+    @RequestParam("did") int departmentId) {
+    try {
+      String response = serviceCaller.getDepartmentPositionStatistics(departmentId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Sets the head of a department.
+   *
+   * @param departmentId the department ID
+   * @param employeeId   the employee ID
+   * @return a response indicating the outcome
+   */
+  @PatchMapping(value = "/setDeptHead", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> setDepartmentHead(
+    @RequestParam("did") int departmentId,
+    @RequestParam("eid") int employeeId) {
+    try {
+      String response = serviceCaller.setDepartmentHead(departmentId, employeeId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Endpoint to update an employee's information.
+   *
+   * @param employeeId  the employee ID
+   * @param position    (optional) the position to update
+   * @param salary      (optional) the salary to update
+   * @param performance (optional) the performance to update
+   * @return the response from the service
+   */
+  @PatchMapping(value = "/updateEmpInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> updateEmployeeInfo(
+    @RequestParam("eid") int employeeId,
+    @RequestParam(value = "position", required = false) String position,
+    @RequestParam(value = "salary", required = false) Double salary,
+    @RequestParam(value = "performance", required = false) Double performance) {
+    try {
+      String response = serviceCaller.updateEmployeeInfo(employeeId, position, salary, performance);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", "Failed to update employee info: " + e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Endpoint to add an employee to a department.
+   *
+   * @param departmentId the department ID
+   * @param name the employee name
+   * @param hireDate the hire date of the employee
+   * @param position (optional) the position of the employee
+   * @param salary (optional) the salary of the employee
+   * @param performance (optional) the performance of the employee
+   * @return the response from the service
+   */
+  @PostMapping(value = "/addEmpToDept", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> addEmployeeToDepartment(
+    @RequestParam("did") int departmentId,
+    @RequestParam("name") String name,
+    @RequestParam("hireDate") String hireDate,
+    @RequestParam(value = "position", required = false) String position,
+    @RequestParam(value = "salary", required = false) Double salary,
+    @RequestParam(value = "performance", required = false) Double performance) {
+    try {
+      String response = serviceCaller.addEmployeeToDepartment(departmentId, name, hireDate, position, salary, performance);
+      return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", "Failed to add employee to department: " + e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Endpoint to remove an employee from a department.
+   *
+   * @param departmentId the department ID
+   * @param employeeId the employee ID
+   * @return the response from the service
+   */
+  @DeleteMapping(value = "/removeEmpFromDept", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> removeEmployeeFromDepartment(
+    @RequestParam("did") int departmentId,
+    @RequestParam("eid") int employeeId) {
+    try {
+      String response = serviceCaller.removeEmployeeFromDepartment(departmentId, employeeId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", "Failed to remove employee from department: " + e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
