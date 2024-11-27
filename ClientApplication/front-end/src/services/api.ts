@@ -1,4 +1,3 @@
-const SERVICE_API_BASE_URL = 'http://localhost:8080';
 const CLIENT_SERVICE_API_BASE_URL = 'http://localhost:8081';
 
 import {
@@ -62,25 +61,25 @@ class ApiService {
 
   // Department endpoints (using SERVICE_API_BASE_URL)
   static async getDepartmentInfo(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentInfo>> {
-    return this.request<DepartmentInfo>('/getDeptInfo', 'GET', SERVICE_API_BASE_URL, {cid: clientId, did: departmentId});
+    return this.request<DepartmentInfo>('/getDeptInfo', 'GET', CLIENT_SERVICE_API_BASE_URL, {cid: clientId, did: departmentId});
   }
 
   static async getDepartmentBudgetStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentBudgetStats>> {
-    return this.request<DepartmentBudgetStats>('/statDeptBudget', 'GET', SERVICE_API_BASE_URL, {
+    return this.request<DepartmentBudgetStats>('/statDeptBudget', 'GET', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString()
     });
   }
 
   static async getDepartmentPerfStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentPerfStats>> {
-    return this.request<DepartmentPerfStats>('/statDeptPerf', 'GET', SERVICE_API_BASE_URL, {
+    return this.request<DepartmentPerfStats>('/statDeptPerf', 'GET', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString()
     });
   }
 
   static async getDepartmentPosStats(clientId: string, departmentId: number): Promise<ApiResponse<DepartmentPosStats>> {
-    return this.request<DepartmentPosStats>('/statDeptPos', 'GET', SERVICE_API_BASE_URL, {
+    return this.request<DepartmentPosStats>('/statDeptPos', 'GET', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString()
     });
@@ -91,7 +90,7 @@ class ApiService {
     departmentId: number,
     employeeId: number
   ): Promise<ApiResponse<BasicResponse>> {
-    return this.request<BasicResponse>('/setDeptHead', 'PATCH', SERVICE_API_BASE_URL, {
+    return this.request<BasicResponse>('/setDeptHead', 'PATCH', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString(),
       eid: employeeId.toString()
@@ -100,7 +99,7 @@ class ApiService {
 
   // Employee Endpoints (using SERVICE_API_BASE_URL)
   static async getEmployeeInfo(clientId: string, employeeId: number): Promise<ApiResponse<EmployeeInfo>> {
-    return this.request<EmployeeInfo>('/getEmpInfo', 'GET', SERVICE_API_BASE_URL, {
+    return this.request<EmployeeInfo>('/getEmpInfo', 'GET', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       eid: employeeId.toString()
     });
@@ -115,7 +114,7 @@ class ApiService {
     salary: number = 0,
     performance: number = 0
   ): Promise<ApiResponse<EmployeeInfo>> {
-    return this.request<EmployeeInfo>('/addEmpToDept', 'POST', SERVICE_API_BASE_URL, {
+    return this.request<EmployeeInfo>('/addEmpToDept', 'POST', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId,
       name,
@@ -135,7 +134,7 @@ class ApiService {
       performance?: number;
     }
   ): Promise<ApiResponse<string>> {
-    return this.request<string>('/updateEmpInfo', 'PATCH', SERVICE_API_BASE_URL, {
+    return this.request<string>('/updateEmpInfo', 'PATCH', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       eid: employeeId.toString(),
       ...updates,
@@ -147,7 +146,7 @@ class ApiService {
     departmentId: number,
     employeeId: number
   ): Promise<ApiResponse<BasicResponse>> {
-    return this.request<BasicResponse>('/removeEmpFromDept', 'DELETE', SERVICE_API_BASE_URL, {
+    return this.request<BasicResponse>('/removeEmpFromDept', 'DELETE', CLIENT_SERVICE_API_BASE_URL, {
       cid: clientId,
       did: departmentId.toString(),
       eid: employeeId.toString()
