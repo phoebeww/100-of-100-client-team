@@ -10,10 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ServiceApplication {
 
   public static void main(String[] args) {
-    // Set the production database connection to be the real MySQL connection
-    DatabaseConnection db = MysqlConnection.getInstance();
-    HrDatabaseFacade.setConnection(db);
-
     SpringApplication.run(ServiceApplication.class, args);
   }
 }
