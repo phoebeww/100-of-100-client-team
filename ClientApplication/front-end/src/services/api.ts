@@ -28,7 +28,6 @@ class ApiService {
         url.searchParams.append(key, String(params[key]))
       );
     }
-
     const response = await fetch(url.toString(), {
       method,
       headers: {
@@ -37,22 +36,26 @@ class ApiService {
       ...(method !== 'GET' && params ? {body: JSON.stringify(params)} : {})
     });
 
+    console.log('Response Status:', response.status);
     const data = await response.json();
+    console.log('Response Body:', data);
     return {data, status: response.status};
   }
 
   // Auth endpoints (using AUTH_BASE_URL)
-  static async login(clientId: string): Promise<ApiResponse<LoginResponse>> {
-    return this.request<LoginResponse>('/login', 'POST', AUTH_BASE_URL, {cid: clientId});
+  static async login(employeeId: string, name: string): Promise<ApiResponse<LoginResponse>> {
+    return this.request<LoginResponse>('/login', 'POST', AUTH_BASE_URL, {eid: employeeId, name: name});
   }
 
-  static async registerOrganization(name: string): Promise<ApiResponse<RegisterResponse>> {
-    return this.request<RegisterResponse>('/register', 'POST', AUTH_BASE_URL, {name});
+  static async registerEmployee(firstName: string, lastName: string, departmentId: number, hireDate: string,
+                                position: string): Promise<ApiResponse<RegisterResponse>> {
+    return this.request<RegisterResponse>(
+      '/register', 'POST', AUTH_BASE_URL, {firstName, lastName, departmentId, hireDate, position});
   }
 
   // Organization endpoints (using API_BASE_URL)
   static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
-    return this.request<Organization>('/getOrgInfo', 'GET', API_BASE_URL, {cid: clientId});
+    return this.request<Organization>('/getOrgInfo', 'GET', AUTH_BASE_URL, {cid: clientId});
   }
 
   // Department endpoints (using API_BASE_URL)
