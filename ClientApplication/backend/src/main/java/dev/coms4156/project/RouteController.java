@@ -121,7 +121,7 @@ public class RouteController {
       }
 
       response.put("status", "success");
-      response.put("message", "Employee registered successfully");
+      response.put("message", employeeData.get("message"));
 
       return new ResponseEntity<>(response, HttpStatus.CREATED);
     } catch (Exception e) {
@@ -131,6 +131,29 @@ public class RouteController {
       return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  /**
+   * Retrieves organization information for the given client ID.
+   *
+   * @return the response from the service containing organization information
+   */
+  @GetMapping(value = "/getOrgInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getOrganization(
+    @RequestParam("cid") String clientId
+  ) {
+    try {
+      // Call the service to retrieve organization info
+      String response = serviceCaller.getOrganizationInfo(clientId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      // Handle any errors and return an appropriate response
+      Map<String, String> errorResponse = new HashMap<>();
+      errorResponse.put("status", "failed");
+      errorResponse.put("message", e.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+  }
+
 
   /**
    * Adds a recurring shift assignment for an employee.

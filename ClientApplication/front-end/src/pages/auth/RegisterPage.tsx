@@ -39,6 +39,12 @@ const RegisterPage: React.FC = () => {
         fetchDepartments();
     }, []);
 
+    // find employeeId
+    const extractEmployeeId = (message) => {
+        const match = message.match(/Employee \[(\d+)]/); // Match "Employee [12345]"
+        return match ? match[1] : null; // Return the ID or null if not found
+    };
+
     const handleRegister = async () => {
         if (!firstName.trim() || !lastName.trim() || !departmentId || !hireDate.trim() || !position.trim()) {
             setMessage('Please fill in all fields.');
@@ -48,8 +54,9 @@ const RegisterPage: React.FC = () => {
         setIsLoading(true);
         try {
             const response = await ApiService.registerEmployee(firstName, lastName, parseInt(departmentId, 10), hireDate, position);
+            const employeeId = extractEmployeeId(response.data.message);
             if (response.status === 201 && response.data.status === 'success') {
-                setMessage('Registration successful! You are now registered.');
+                setMessage(`Registration successful! Your employee ID is ${employeeId}.`);
             } else {
                 setMessage(`Registration failed: ${response.data.message || 'Unknown error'}`);
             }

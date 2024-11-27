@@ -28,7 +28,6 @@ class ApiService {
         url.searchParams.append(key, String(params[key]))
       );
     }
-
     const response = await fetch(url.toString(), {
       method,
       headers: {
@@ -37,7 +36,9 @@ class ApiService {
       ...(method !== 'GET' && params ? {body: JSON.stringify(params)} : {})
     });
 
+    console.log('Response Status:', response.status);
     const data = await response.json();
+    console.log('Response Body:', data);
     return {data, status: response.status};
   }
 
@@ -54,7 +55,7 @@ class ApiService {
 
   // Organization endpoints (using API_BASE_URL)
   static async getOrgInfo(clientId: string): Promise<ApiResponse<Organization>> {
-    return this.request<Organization>('/getOrgInfo', 'GET', API_BASE_URL, {cid: clientId});
+    return this.request<Organization>('/getOrgInfo', 'GET', AUTH_BASE_URL, {cid: clientId});
   }
 
   // Department endpoints (using API_BASE_URL)
