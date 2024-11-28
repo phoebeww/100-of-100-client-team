@@ -93,117 +93,130 @@ const salaryData = [
   { name: "Highest", value: Number(budgetStats.highest) || 0 }
 ].filter(item => item.value > 0);
 
-return (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Position Distribution Chart */}
-    <Card>
-  <CardHeader>
-    <CardTitle>Position Distribution</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="h-[300px]">
-      {positionData.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={positionData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={false}  // 移除标签
-              outerRadius={100}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {positionData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip 
-              formatter={(value, name, entry) => {
-                const total = positionData.reduce((sum, item) => sum + item.value, 0);
-                const percent = ((value as number) / total * 100).toFixed(1);
-                return [`${value} (${percent}%)`, name];
-              }}
-            />
-            <Legend
-              layout="vertical"
-              align="right"
-              verticalAlign="middle"
-              formatter={(value) => (
-                <span className="text-sm">{value}</span>
-              )}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      ) : (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          No position data available
-        </div>
-      )}
-    </div>
-  </CardContent>
-</Card>
-
-    {/* Performance Distribution Chart */}
-    {performanceData.some(item => item.value > 0) && (
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Position Distribution Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Performance Distribution</CardTitle>
+          <CardTitle>Position Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis domain={[0, 5]} />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
-                  name="Performance Score"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {positionData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={positionData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={false}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {positionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value, name, entry) => {
+                      const total = positionData.reduce((sum, item) => sum + item.value, 0);
+                      const percent = ((value as number) / total * 100).toFixed(1);
+                      return [`${value} (${percent}%)`, name];
+                    }}
+                  />
+                  <Legend
+                    layout="vertical"
+                    align="right"
+                    verticalAlign="middle"
+                    formatter={(value) => {
+                      // Split the text into two lines for long names
+                      const words = value.split(' ');
+                      const midIndex = Math.ceil(words.length / 2);
+                      const firstLine = words.slice(0, midIndex).join(' ');
+                      const secondLine = words.slice(midIndex).join(' ');
+
+                      return (
+                        <span className="text-sm">
+                        {firstLine}
+                          <br />
+                          {secondLine}
+                      </span>
+                      );
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No position data available
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
-    )}
 
-    {/* Department Overview */}
-    <Card className="md:col-span-2">
-      <CardHeader>
-        <CardTitle>Department Overview</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Total Budget</h3>
-            <p className="mt-1 text-2xl font-semibold">
-              ${budgetStats.total?.toLocaleString()}
-            </p>
+      {/* Performance Distribution Chart */}
+      {performanceData.some(item => item.value > 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Performance Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={performanceData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 5]} />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#8884d8"
+                    activeDot={{ r: 8 }}
+                    name="Performance Score"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Department Overview */}
+      <Card className="md:col-span-2">
+        <CardHeader>
+          <CardTitle>Department Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Total Budget</h3>
+              <p className="mt-1 text-2xl font-semibold">
+                ${budgetStats.total?.toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Average Salary</h3>
+              <p className="mt-1 text-2xl font-semibold">
+                ${budgetStats.average?.toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Average Performance</h3>
+              <p className="mt-1 text-2xl font-semibold">
+                {perfStats.average?.toFixed(2)}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Average Salary</h3>
-            <p className="mt-1 text-2xl font-semibold">
-              ${budgetStats.average?.toLocaleString()}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Average Performance</h3>
-            <p className="mt-1 text-2xl font-semibold">
-              {perfStats.average?.toFixed(2)}
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
+        </CardContent>
+      </Card>
+    </div>
+  );
+
 };
 
 export default DepartmentStats;
