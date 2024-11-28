@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class RouteController {
 
   @Autowired
-  private MyServiceCaller serviceCaller;
+  MyServiceCaller serviceCaller;
 
   /**
    * Redirects to the homepage.
