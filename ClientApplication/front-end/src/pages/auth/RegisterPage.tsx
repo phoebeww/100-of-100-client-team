@@ -74,10 +74,17 @@ const RegisterPage: React.FC = () => {
 
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          {/* Application Title */}
+          <div className="text-center mb-6 mt-14">
+              <h1 className="text-4xl font-extrabold text-gray-900">
+                  HospitalTracker<sup className="text-lg">®</sup>
+              </h1>
+          </div>
+
           <div className="w-full max-w-md space-y-6">
               <div className="space-y-2 text-center">
-                  <h1 className="text-3xl font-bold">Register Employee</h1>
-                  <p className="text-gray-500">Add as a new employee to your organization</p>
+                  <h2 className="text-3xl font-bold">Register Employee</h2>
+                  <p className="text-gray-500">Join as a new employee to your organization</p>
               </div>
 
               <div className="space-y-4">
@@ -157,6 +164,7 @@ const RegisterPage: React.FC = () => {
           </div>
       </div>
     );
+
 };
 
 export default RegisterPage;

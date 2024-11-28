@@ -23,12 +23,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
 
         setIsLoading(true);
         try {
-            const fullName = `${firstName.trim()} ${lastName.trim()}`; // Format name as "firstname%20lastname"
+            const fullName = `${firstName.trim()} ${lastName.trim()}`;
             const response: ApiResponse<LoginResponse> = await ApiService.login(employeeId, fullName);
 
             if (response.status === 200 && response.data.status === 'success') {
                 setIsAuthenticated(true);
                 localStorage.setItem('employeeId', employeeId);
+                localStorage.setItem('employeeName', fullName);
                 setMessage(response.data.message);
             } else {
                 setMessage('Login failed. Please check your details and try again.');
@@ -44,8 +45,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <div className="w-full max-w-md space-y-6">
-              <div className="space-y-2 text-center">
-                  <h1 className="text-3xl font-bold">Employee Login</h1>
+              <div className="space-y-4 text-center">
+                  <h1 className="text-4xl font-extrabold text-gray-900">
+                      HospitalTracker<sup className="text-lg">®</sup>
+                  </h1>
+                  <h2 className="text-3xl font-bold">Employee Login</h2>
                   <p className="text-gray-500">Enter your details to continue</p>
               </div>
 
