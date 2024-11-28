@@ -94,30 +94,339 @@ mvn jacoco:report
 
 Test reports can be found in the `target/site/jacoco` directory after running the coverage analysis
 
+### End-to-End Testing Guide
+
+1. Run the Service:
+
+    - Ensure the service portion of the system is running.
+
+    - Please review the build guide on the linked repository [100-of-100-service-team](https://github.com/Alex-XJK/100-of-100-service-team/tree/main)
+      for instruction on how to run the service.
+    - Confirm the proper configuration for service.url in `ClientApplication/backend/src/resources/application.properties`,
+      if local host please use `http://localhost:8080`. If running a cloud based instance of the service, please use the provided IP address.
+2. Run the Frontend and Backend of the Application
+
+    - Please open two separate terminals: one for the **frontend** and another for the **backend**.
+    - By default, the backend runs on port `8081`. Refer to the build guide in this README for instructions on how to set up and run the backend.
+    - The frontend is configured to connect to the backend on port `8081` and should be run in its designated terminal. Ensure the frontend is built and deployed correctly.
+3. Access the Login Page
+    - You are expected to see the login page with title `HospitalTracker®` displayed.
+    - Fields for First Name, Last Name, and Employee ID are visible.
+4. Register as a New Employee
+    - Action:
+        - Click the "Register as Employee" link on the login page.
+        - Fill out the form with the following details:
+            - First Name: Enter your first name.
+            - Last Name: Enter your last name.
+            - Department: Select a department from the dropdown.
+            - Hire Date: Use a valid date in the format YYYY-MM-DD.
+            - Position: Provide a position title (e.g., Nurse or Doctor).
+        - Click the Register button.
+    - Expected Result:
+        - Registration is successful, and the page displays a message: "Registration successful! Your Employee ID is: [ID]".
+          Note down the Employee ID for login purposes.
+5. Login with Valid Credentials
+    - Action:
+        - On the login page, enter:
+            - First Name: Your registered first name.
+            - Last Name: Your registered last name.
+            - Employee ID: The ID provided during registration.
+        - Click the Login button.
+    - Expected Result:
+        - You are redirected to the dashboard page. Under title `HospitalTracker®`, you will see `Logged in as [Name] (ID: [ID])`.
+6. Navigate Through the Application
+    - Action: Explore the available menu options:
+        - Dashboard: Displays an overview of the hospital and key metrics.
+        - Departments: View a list of all departments and their details.
+        - Employees: Access employee details and manage employee information.
+        - Shifts: Manage employee weekly shift calendar.
+    - Expected Result:
+        - Each menu option displays the corresponding page with relevant information.
+7. Add an Employee
+    - Action:
+        - Navigate to the Employees section, click Add Employee.
+        - Fill out the form with:
+            - Name: Full name.
+            - Department: Select a department.
+            - Hire Date: Use a valid date.
+            - Position: Specify a position.
+            - Salary: Enter the salary.
+            - Performance: Enter the performance score.
+    - Submit the form.
+    - Expected Result:
+        - The new employee appears in the list with all the entered details.
+8. Assign/Delete Shifts to an Employee
+    - Action:
+        - Navigate to the Shifts section.
+        - In the calendar, choose a slot with "+" sign. You will be assigned to the time slot once you click on it.
+        - If you want to delete the shift you are assigned on, click on the "x" sign on that time slot.
+        - Note: user can only change their own shift time. They cannot make change to other people's shifts.
+    - Expected Result:
+        - The assigned shift is displayed in the employee's schedule.
+9. Edit/Delete an Employee
+    - Action:
+        - If you want to edit, navigate to the Employees section, select an employee and click Edit.
+        - Update details (e.g., change position, performance or salary) and submit the changes.
+        - If you want to delete, select an employee click on the delete, confirm with the pop-up window with yes.
+    - Expected Result:
+        - The employee's updated information is reflected in the list;
+        - The employee is successfully deleted (no longer showing in the list).
+10. View Department Statistics
+    - Action:
+        - Navigate to the Dashboard section.
+        - Select a department and view its statistics, such as:
+            - Position Distribution.
+            - Performance Metrics.
+            - Budget Statistics.
+    - Expected Result:
+        - The statistics are displayed accurately with charts and data.
+11. Edit Department Details
+    - Set Department Head:
+        - Choose an employee from the dropdown list and click Set as Head to assign them as the department head. You will see department
+          head changes.
+    - Add Employee:
+        - Fill out the employee's details (First Name, Last Name, Position, Hire Date, Salary, Performance) and click Add Employee to add them to the department.
+          You will see the added employee in the department.
+    - Edit Employee:
+        - Select an employee, modify their details, and click Save Changes to update their information.
+    - Delete Employee:
+        - Select an employee and click Delete Employee, then confirm the deletion.
+12. Log Out
+    - Action: Click the Log Out button in the header.
+    - Expected Result: You are redirected to the login page.
+
+This is the end of the end-to-end test.
+
 ## API Documentation
 
 ### POST `/login`
-
-- Input
-
+- **Description**: Log in as employee to HospitalTrackers.
+- **Input**
   - `eid` (string): Employee ID
   - `name` (string): Employee name
-
-- Output
-
-  ```
+- **Output**
+  ```json
   {
     "status": "success|failed",
     "message": "Success or error message"
   }
-  ```
 
-- Status Codes
-
+- **Status Codes**
   - 200: Success
   - 401: Unauthorized
   - 404: Not Found
   - 500: Internal Server Error
+
+### POST `/register`
+
+- **Description**: Registers a new employee within the specified organization.
+- **Input**:
+    - `firstName` (string): The first name of the employee.
+    - `lastName` (string): The last name of the employee.
+    - `departmentId` (integer): The ID of the department to which the employee will be added.
+    - `hireDate` (string): The hire date of the employee (format: `yyyy-MM-dd`).
+    - `position` (string): The position or role of the employee.
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+
+- **Status Codes**:
+  - 201: Created
+  - 400: Bad Request
+  - 500: Internal Server Error
+
+### POST `/addShift`
+
+- **Description**: Adds a recurring shift assignment for an employee.
+- **Input**:
+    - `cid` (string): Encoded client ID.
+    - `employeeId` (integer): Employee ID.
+    - `dayOfWeek` (integer): Day of the week (1–7).
+    - `timeSlot` (integer): Time slot (e.g., 0: 9–12, 1: 14–17).
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+
+- **Status Codes**:
+    - 201: Created
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### DELETE `/removeShift`
+
+- **Description**: Removes a recurring shift assignment for an employee.
+
+- **Input**:
+    - `cid` (string): Encoded client ID.
+    - `employeeId` (integer): Employee ID.
+    - `dayOfWeek` (integer): Day of the week (1–7, Monday to Sunday).
+    - `timeSlot` (integer): Time slot (e.g., 0: 9–12, 1: 14–17, 2: 18–21).
+
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+  
+- **Status Codes**:
+    - 200: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### GET `/getOrgInfo`
+
+- **Description**: Retrieves organization information for the current client.
+- **Input**: None
+- **Output**:
+  ```json
+  {
+      "organizationName": "String",
+      "departments": [
+      {
+        "id": "integer",
+        "name": "string",
+        "employeeCount": "integer"
+      }
+    ]
+  }
+
+- **Status Codes**:
+    - 201: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### GET `/getDeptInfo`
+
+- **Description**: Retrieves detailed information about a specific department.
+- **Input**: `did` (integer): The ID of the department.
+- **Output**:
+  ```json
+  {
+  "id": "integer",
+  "name": "string",
+  "head": "string",
+  "headId": "integer",
+  "employeeCount": "integer",
+  "employees": [
+       {
+         "id": "integer",
+         "name": "string",
+         "position": "string",
+         "performance": "number",
+         "salary": "number"
+       }
+    ]
+  }
+
+- **Status Codes**:
+    - 201: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### GET `/getEmpInfo`
+
+- **Description**: Retrieves information about a specific employee.
+- **Input**: `eid` (integer): The ID of the employee.
+- **Output**:
+  ```json
+  {
+  "id": "integer",
+  "name": "string",
+  "position": "string",
+  "performance": "number",
+  "salary": "number",
+  "department": "string"
+  }
+
+- **Status Codes**:
+    - 201: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### POST `/addEmpToDept`
+
+- **Description**: Adds a new employee to a specific department.
+- **Input**:
+    - `did` (integer): The department ID.
+    - `name` (string): The name of the employee.
+    - `hireDate` (string): The hire date of the employee (format: yyyy-MM-dd).
+    - `position` (string, optional): The position of the employee.
+    - `salary` (double, optional): The salary of the employee.
+    - `performance` (double, optional): The performance score of the employee.
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+
+- **Status Codes**:
+    - 201: Created
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### DELETE `/removeEmpFromDept`
+
+- **Description**: Removes an employee from a specific department.
+- **Input**:
+    - `did` (integer): The department ID.
+    - `eid` (integer): The employee ID.
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+
+- **Status Codes**:
+    - 200: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### PATCH `/setDeptHead`
+
+- **Description**: Sets the head of a department.
+- **Input**:
+    - `did` (integer): The department ID.
+    - `eid` (integer): The employee ID.
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+
+- **Status Codes**:
+    - 200: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
+
+### PATCH `/updateEmpInfo`
+
+- **Description**: Updates the information of an employee.
+- **Input**:
+    - `eid` (integer): The employee ID.
+    - `position` (string, optional): The position to update.
+    - `salary` (double, optional): The salary to update.
+    - `performance` (double, optional): The performance score to update.
+- **Output**:
+  ```json
+  {
+    "status": "success|failed",
+    "message": "Success or error message"
+  }
+
+- **Status Codes**:
+    - 200: Success
+    - 400: Bad Request
+    - 500: Internal Server Error
 
 ## Development Guide
 
@@ -192,6 +501,5 @@ const response = await fetch('http://localhost:8081/login', {
 - JUnit (5.9.3)
   - Source: Maven Central
   - Location: `pom.xml`
-
 
 
