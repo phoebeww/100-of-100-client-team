@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PlusCircle, XCircle } from 'lucide-react';
 import ApiService from '../../services/api.ts';
-import { ShiftResponse, ShiftInfo, TimeSlotInfo } from '../../types/apiResponses';
+import { ShiftResponse, ShiftInfo } from '../../types/apiResponses';
 
 interface TimeSlot {
   value: string;

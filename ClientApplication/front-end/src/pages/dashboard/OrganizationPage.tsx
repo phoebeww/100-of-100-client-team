@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Building2, DollarSign, TrendingUp, Users, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Building2, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import ApiService from "../../services/api.ts";

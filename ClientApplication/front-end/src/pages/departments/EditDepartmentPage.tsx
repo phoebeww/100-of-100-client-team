@@ -31,6 +31,7 @@ const EditDepartmentPage = () => {
           setDepartment(deptResponse.data);
           setEmployees(deptResponse.data.employees || []);
           setSelectedHead(deptResponse.data.headId || null);
+          console.log(department);
         } else {
           setError('Failed to fetch department data');
         }

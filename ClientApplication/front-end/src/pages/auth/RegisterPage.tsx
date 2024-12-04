@@ -17,6 +17,7 @@ const RegisterPage: React.FC = () => {
     // Fetch departments
     useEffect(() => {
         const fetchDepartments = async () => {
+            localStorage.setItem('clientId', "MQ");
             const clientId = localStorage.getItem('clientId');
             if (!clientId) {
                 setError('No client ID found');
@@ -29,6 +30,7 @@ const RegisterPage: React.FC = () => {
                     setDepartments(response.data.departments);
                 } else {
                     setError('Failed to fetch departments');
+                    console.log(error);
                 }
             } catch (err) {
                 console.error('Error fetching departments:', err);

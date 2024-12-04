@@ -1,4 +1,4 @@
-const CLIENT_SERVICE_API_BASE_URL = 'http://localhost:8081';
+const CLIENT_SERVICE_API_BASE_URL = 'https://coms-4156-client-backend.ue.r.appspot.com/';
 
 import {
   ApiResponse,
