@@ -85,6 +85,15 @@ Our app offers several advantages:
    mvn spring-boot:run
    ```
 
+## Deployment on Cloud
+The application is deployed using Google Cloud App Engine and can be accessed using the following URLs:
+
+- Application: (https://meal-prep-437118.ue.r.appspot.com/)
+  - Access the application.
+- Only Backend: (https://coms-4156-client-backend.ue.r.appspot.com/)
+  - Use this for backend testing.
+- If you need to access just the backend functionality, use the backend URL provided above.
+
 ## Running Tests
 
 ### Backend Tests

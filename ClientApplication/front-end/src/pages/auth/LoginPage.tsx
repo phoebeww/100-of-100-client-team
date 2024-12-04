@@ -30,6 +30,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
                 setIsAuthenticated(true);
                 localStorage.setItem('employeeId', employeeId);
                 localStorage.setItem('employeeName', fullName);
+                localStorage.setItem('clientId', "MQ");
                 setMessage(response.data.message);
             } else {
                 setMessage('Login failed. Please check your details and try again.');

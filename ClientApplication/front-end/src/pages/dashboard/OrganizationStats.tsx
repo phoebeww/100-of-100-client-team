@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  BarChart, Bar, LineChart, Line, PieChart, Pie, 
+import {
+  LineChart, Line, PieChart, Pie,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,
-  ResponsiveContainer 
+  ResponsiveContainer
 } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import ApiService from "../../services/api.ts";
@@ -37,11 +37,8 @@ const DepartmentStats: React.FC<DepartmentStatsProps> = ({ clientId, departmentI
         console.log('Position stats:', posRes.data);
 
         setBudgetStats(budgetRes.data);
-        console.log('Budget stats:', budgetStats);
         setPerfStats(perfRes.data);
-        console.log('Performance stats:', perfStats);
         setPosStats(posRes.data);
-        console.log('Position stats:', posStats);
       } catch (err) {
         console.error('Error fetching stats:', err);
         setError('Failed to load department statistics');
@@ -71,27 +68,20 @@ const DepartmentStats: React.FC<DepartmentStatsProps> = ({ clientId, departmentI
     return <div className="text-center py-4">No statistics available</div>;
   }
 
- // Transform position statistics for pie chart
- const positionData = Object.entries(posStats).map(([name, value]) => ({
-  name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize first letter
-  value: Number(value) || 0
-})).filter(item => item.value > 0);
+  // Transform position statistics for pie chart
+  const positionData = Object.entries(posStats).map(([name, value]) => ({
+    name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize first letter
+    value: Number(value) || 0
+  })).filter(item => item.value > 0);
 
-// Transform performance data for line chart
-const performanceData = [
-  { name: "Lowest", value: perfStats.lowest || 0 },
-  { name: "25th", value: perfStats.percentile25 || 0 },
-  { name: "Median", value: perfStats.median || 0 },
-  { name: "75th", value: perfStats.percentile75 || 0 },
-  { name: "Highest", value: perfStats.highest || 0 }
-].filter(item => item.value !== 0);
-
-// Transform salary data for bar chart
-const salaryData = [
-  { name: "Average", value: Number(budgetStats.average) || 0 },
-  { name: "Lowest", value: Number(budgetStats.lowest) || 0 },
-  { name: "Highest", value: Number(budgetStats.highest) || 0 }
-].filter(item => item.value > 0);
+  // Transform performance data for line chart
+  const performanceData = [
+    { name: "Lowest", value: perfStats.lowest || 0 },
+    { name: "25th", value: perfStats.percentile25 || 0 },
+    { name: "Median", value: perfStats.median || 0 },
+    { name: "75th", value: perfStats.percentile75 || 0 },
+    { name: "Highest", value: perfStats.highest || 0 }
+  ].filter(item => item.value !== 0);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,12 +105,12 @@ const salaryData = [
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {positionData.map((entry, index) => (
+                    {positionData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value, name, entry) => {
+                    formatter={(value, name, _) => {
                       const total = positionData.reduce((sum, item) => sum + item.value, 0);
                       const percent = ((value as number) / total * 100).toFixed(1);
                       return [`${value} (${percent}%)`, name];
@@ -139,10 +129,10 @@ const salaryData = [
 
                       return (
                         <span className="text-sm">
-                        {firstLine}
+                          {firstLine}
                           <br />
                           {secondLine}
-                      </span>
+                        </span>
                       );
                     }}
                   />
